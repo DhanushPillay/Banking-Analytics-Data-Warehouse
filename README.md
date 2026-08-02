@@ -90,7 +90,24 @@ erDiagram
 
 ---
 
-## 📊 Data Cube & OLAP Queries
+## 📊 Data Cube Design & OLAP Queries
+
+A Data Cube was designed to perform multidimensional analysis across three core axes. By navigating this cube, we can instantly slice and dice transaction amounts.
+
+```mermaid
+graph TD
+    %% Data Cube Axes
+    TIME[X-Axis: Time<br/>Year ➔ Quarter ➔ Month]
+    GEO[Y-Axis: Geography<br/>Region ➔ City ➔ Branch]
+    TYPE[Z-Axis: Transaction<br/>Deposit vs Withdrawal]
+    
+    %% Core Fact Measure
+    CUBE(((Data Cube<br/>Total Transaction Amount)))
+    
+    TIME --> CUBE
+    GEO --> CUBE
+    TYPE --> CUBE
+```
 
 All requirements for OLAP operations have been successfully fulfilled in `sql/olap_queries.sql`, which contains **12 distinct analytical queries**:
 - **Roll-up:** Aggregates deposits dynamically from Month -> Quarter -> Year.
