@@ -23,7 +23,8 @@ banking-dw/
 │   ├── schema.sql         # star/galaxy schema DDL
 │   └── olap_queries.sql   # 12 OLAP queries (roll-up, drill-down, slice, dice, cube)
 └── scripts/
-    └── generate_data.py   # generates + loads representative synthetic banking data
+    ├── generate_data.py   # generates + loads representative synthetic banking data
+    └── load_real_data.py  # loads the real PKDD'99 dataset into the schema
 ```
 
 ## Step-by-step
@@ -52,7 +53,14 @@ docker exec -i banking_dw_postgres psql -U dw_user -d banking_dw < sql/schema.sq
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+
+# Option A: Generate Synthetic Data
 python scripts/generate_data.py
+
+# Option B: Use Real Historical Data (PKDD'99)
+# 1. Download from Kaggle: https://www.kaggle.com/datasets/arjunbhasin2013/pkdd-99-financial-data-set
+# 2. Extract into a `data/` folder in this project (e.g., data/client.csv, data/trans.csv)
+# 3. Run: python scripts/load_real_data.py
 ```
 This generates and loads: 15 branches, 800 customers, ~1,030 accounts, 300 loans,
 8,000 transactions across a 12-month period (2025) — enough volume for the roll-up/
