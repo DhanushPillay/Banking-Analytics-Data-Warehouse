@@ -12,9 +12,15 @@ The architecture follows a standard Kimball Bottom-Up methodology, extracting ra
 
 ```mermaid
 graph LR
-    A[Raw CSV Data] -->|Python / Pandas| B(ETL Processing)
-    B -->|SQLAlchemy| C[(PostgreSQL Data Warehouse)]
-    C -->|DirectQuery / Import| D[Power BI Dashboard]
+    %% Premium styling with high-contrast font colors
+    classDef source fill:#1e293b,stroke:#64748b,stroke-width:2px,color:#f8fafc
+    classDef process fill:#0284c7,stroke:#bae6fd,stroke-width:2px,color:#ffffff
+    classDef database fill:#3730a3,stroke:#c7d2fe,stroke-width:2px,color:#ffffff
+    classDef bi fill:#d97706,stroke:#fde68a,stroke-width:2px,color:#ffffff
+
+    A[Raw CSV Data]:::source -->|Python / Pandas| B(ETL Processing):::process
+    B -->|SQLAlchemy| C[(PostgreSQL Data Warehouse)]:::database
+    C -->|DirectQuery / Import| D[Power BI Dashboard]:::bi
 ```
 
 ---
