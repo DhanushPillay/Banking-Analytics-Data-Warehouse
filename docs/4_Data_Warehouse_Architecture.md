@@ -11,8 +11,4 @@ graph LR
     A[Raw CSV Data] -->|Python / Pandas| B(ETL Processing)
     B -->|SQLAlchemy| C[(PostgreSQL Data Warehouse)]
     C -->|DirectQuery / Import| D[Power BI Dashboard]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#fcf,stroke:#333,stroke-width:2px
 ```
