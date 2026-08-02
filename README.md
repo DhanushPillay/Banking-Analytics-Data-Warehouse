@@ -94,19 +94,27 @@ erDiagram
 
 A Data Cube was designed to perform multidimensional analysis across three core axes. By navigating this cube, we can instantly slice and dice transaction amounts.
 
-```mermaid
-graph TD
-    %% Data Cube Axes
-    TIME[X-Axis: Time<br/>Year ➔ Quarter ➔ Month]
-    GEO[Y-Axis: Geography<br/>Region ➔ City ➔ Branch]
-    TYPE[Z-Axis: Transaction<br/>Deposit vs Withdrawal]
-    
-    %% Core Fact Measure
-    CUBE(((Data Cube<br/>Total Transaction Amount)))
-    
-    TIME --> CUBE
-    GEO --> CUBE
-    TYPE --> CUBE
+```text
+                       Branch (Prague, Moravia, Bohemia...)
+                      /
+                     /
+                    +-----------+-----------+-----------+
+                   /           /           /           /|
+                  /           /           /           / |
+                 +-----------+-----------+-----------+  |
+  Transaction   /           /           /           /|  +
+     Type      /           /           /           / | /
+  (Deposit,   +-----------+-----------+-----------+  |/
+ Withdrawal)  |           |           |           |  +
+              |  Deposit  |   134M    |           | /
+              |           |           |           |/
+              +-----------+-----------+-----------+
+              |           |           |           |
+              |Withdrawal |   39M     |           |
+              |           |           |           |
+              +-----------+-----------+-----------+
+                  1997        1998        1999
+                             Year
 ```
 
 All requirements for OLAP operations have been successfully fulfilled in `sql/olap_queries.sql`, which contains **12 distinct analytical queries**:
