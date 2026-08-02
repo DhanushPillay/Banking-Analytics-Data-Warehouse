@@ -100,7 +100,7 @@ erDiagram
 
 A Data Cube was designed to perform multidimensional analysis across three core axes. By navigating this cube, we can instantly slice and dice transaction amounts.
 
-![Data Cube Design](docs/data_cube.svg?v=2)
+![Data Cube Design](docs/data_cube.svg?v=3)
 
 All requirements for OLAP operations have been successfully fulfilled in `sql/olap_queries.sql`, which contains **12 distinct analytical queries**:
 - **Roll-up:** Aggregates deposits dynamically from Month -> Quarter -> Year.
