@@ -42,65 +42,74 @@ To accommodate both transaction metrics and loan metrics, a **Galaxy Schema** (a
 
 ```mermaid
 classDiagram
+    %% Fact Tables (Measurements)
     class fact_transactions {
-        bigint transaction_id PK
+        bigint transaction_id [PK]
         numeric amount
         varchar transaction_type
     }
+    
     class fact_loans {
-        int loan_id PK
+        int loan_id [PK]
         numeric amount
         numeric interest_rate
         varchar status
     }
+    
+    %% Dimension Tables (Context)
     class dim_date {
-        int date_id PK
+        int date_id [PK]
         date full_date
         int year
         int quarter
         varchar month_name
     }
+    
     class dim_branch {
-        int branch_id PK
+        int branch_id [PK]
         varchar branch_name
         varchar city
         varchar region
     }
+    
     class dim_customer {
-        int customer_id PK
+        int customer_id [PK]
         varchar first_name
         varchar last_name
         varchar age_group
         varchar customer_segment
     }
+    
     class dim_account {
-        int account_id PK
+        int account_id [PK]
         varchar account_type
     }
+    
     class dim_loan_type {
-        int loan_type_id PK
+        int loan_type_id [PK]
         varchar loan_type_name
     }
 
-    dim_date "1" <-- "*" fact_transactions : date_id
-    dim_branch "1" <-- "*" fact_transactions : branch_id
-    dim_account "1" <-- "*" fact_transactions : account_id
+    %% Relationships (Placing facts at the center of the star)
+    fact_transactions "*" --> "1" dim_date : date_id
+    fact_transactions "*" --> "1" dim_branch : branch_id
+    fact_transactions "*" --> "1" dim_account : account_id
     
-    dim_date "1" <-- "*" fact_loans : date_id
-    dim_branch "1" <-- "*" fact_loans : branch_id
-    dim_customer "1" <-- "*" fact_loans : customer_id
-    dim_loan_type "1" <-- "*" fact_loans : loan_type_id
+    fact_loans "*" --> "1" dim_date : date_id
+    fact_loans "*" --> "1" dim_branch : branch_id
+    fact_loans "*" --> "1" dim_customer : customer_id
+    fact_loans "*" --> "1" dim_loan_type : loan_type_id
     
-    dim_customer "1" <-- "*" dim_account : customer_id
+    dim_account "*" --> "1" dim_customer : customer_id
 
-    %% Styling: Fact tables in Orange, Dimension tables in Indigo
-    style fact_transactions fill:#ea580c,stroke:#fdba74,stroke-width:2px,color:#fff
-    style fact_loans fill:#ea580c,stroke:#fdba74,stroke-width:2px,color:#fff
-    style dim_date fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
-    style dim_branch fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
-    style dim_customer fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
-    style dim_account fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
-    style dim_loan_type fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
+    %% Aesthetic Premium Styling
+    %% Facts: Deep Violet background with vibrant Purple border
+    classDef fact fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
+    %% Dimensions: Deep Cyan background with vibrant Cyan border
+    classDef dim fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    
+    class fact_transactions,fact_loans fact
+    class dim_date,dim_branch,dim_customer,dim_account,dim_loan_type dim
 ```
 
 ---
