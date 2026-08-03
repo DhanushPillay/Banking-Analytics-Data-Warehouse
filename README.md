@@ -41,6 +41,18 @@ To accommodate both transaction metrics and loan metrics, a **Galaxy Schema** (a
 - `fact_loans`: Tracks disbursed loans, amounts, interest rates, and status (Active/Closed/Defaulted).
 
 ```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#1e293b",
+    "primaryTextColor": "#f8fafc",
+    "primaryBorderColor": "#64748b",
+    "lineColor": "#94a3b8",
+    "secondaryColor": "#1e293b",
+    "tertiaryColor": "#1e293b"
+  },
+  "themeCSS": "[id^=entity-fact_] .er.entityBox { fill: #d97706; stroke: #fde68a; stroke-width: 2px; } [id^=entity-dim_] .er.entityBox { fill: #3730a3; stroke: #c7d2fe; stroke-width: 2px; }"
+}}%%
 erDiagram
     fact_transactions {
         bigint transaction_id PK
