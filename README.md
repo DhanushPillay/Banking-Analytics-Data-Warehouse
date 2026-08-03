@@ -6,7 +6,7 @@ The objective of this project is to **create a Banking Analytics Data Warehouse*
 
 ---
 
-## 🏗️ Data Warehouse Architecture
+## Data Warehouse Architecture
 
 The architecture follows a standard Kimball Bottom-Up methodology, extracting raw historical data (based on the real-world PKDD'99 Financial Dataset), transforming it via Python, and loading it into a PostgreSQL relational database structured for OLAP.
 
@@ -25,7 +25,7 @@ graph LR
 
 ---
 
-## 🗄️ Dimensional Modeling (Galaxy Schema)
+## Dimensional Modeling (Galaxy Schema)
 
 To accommodate both transaction metrics and loan metrics, a **Galaxy Schema** (a schema with multiple Fact tables sharing conformed dimensions) was implemented.
 
@@ -117,7 +117,7 @@ classDiagram
 
 ---
 
-## 📊 Data Cube Design & OLAP Queries
+## Data Cube Design & OLAP Queries
 
 A Data Cube was designed to perform multidimensional analysis across three core axes. By navigating this cube, we can instantly slice and dice transaction amounts.
 
@@ -133,7 +133,7 @@ The final deliverable is an interactive **Power BI dashboard**, successfully con
 
 ---
 
-## 🚀 Setup & Execution Instructions
+## Setup & Execution Instructions
 
 ### Prerequisites
 - **VS Code** + extensions: `Python`, `Docker`, and `SQLTools`
