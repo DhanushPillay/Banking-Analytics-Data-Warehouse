@@ -124,17 +124,15 @@ classDiagram
 
     %% Aesthetic Premium Styling
     %% Facts: Deep Violet background with vibrant Purple border
-    classDef fact fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
-    %% Dimensions: Deep Cyan background with vibrant Cyan border
-    classDef dim fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    style fact_transactions fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
+    style fact_loans fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
     
-    class fact_transactions fact
-    class fact_loans fact
-    class dim_date dim
-    class dim_branch dim
-    class dim_customer dim
-    class dim_account dim
-    class dim_loan_type dim
+    %% Dimensions: Deep Cyan background with vibrant Cyan border
+    style dim_date fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    style dim_branch fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    style dim_customer fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    style dim_account fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    style dim_loan_type fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
 ```
 
 ---
