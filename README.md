@@ -108,8 +108,13 @@ classDiagram
     %% Dimensions: Deep Cyan background with vibrant Cyan border
     classDef dim fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
     
-    class fact_transactions,fact_loans fact
-    class dim_date,dim_branch,dim_customer,dim_account,dim_loan_type dim
+    class fact_transactions fact
+    class fact_loans fact
+    class dim_date dim
+    class dim_branch dim
+    class dim_customer dim
+    class dim_account dim
+    class dim_loan_type dim
 ```
 
 ---
