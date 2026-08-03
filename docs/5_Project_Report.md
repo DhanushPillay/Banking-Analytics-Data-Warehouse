@@ -61,57 +61,66 @@ To accommodate both transaction metrics and loan metrics, a **Galaxy Schema** (a
 - `fact_loans`: Tracks disbursed loans, their amounts, interest rates, and current status (Active/Closed/Defaulted).
 
 ```mermaid
-erDiagram
-    fact_transactions {
+classDiagram
+    class fact_transactions {
         bigint transaction_id PK
         numeric amount
         varchar transaction_type
     }
-    fact_loans {
+    class fact_loans {
         int loan_id PK
         numeric amount
         numeric interest_rate
         varchar status
     }
-    dim_date {
+    class dim_date {
         int date_id PK
         date full_date
         int year
         int quarter
         varchar month_name
     }
-    dim_branch {
+    class dim_branch {
         int branch_id PK
         varchar branch_name
         varchar city
         varchar region
     }
-    dim_customer {
+    class dim_customer {
         int customer_id PK
         varchar first_name
         varchar last_name
         varchar age_group
         varchar customer_segment
     }
-    dim_account {
+    class dim_account {
         int account_id PK
         varchar account_type
     }
-    dim_loan_type {
+    class dim_loan_type {
         int loan_type_id PK
         varchar loan_type_name
     }
 
-    dim_date ||--o{ fact_transactions : "date_id"
-    dim_branch ||--o{ fact_transactions : "branch_id"
-    dim_account ||--o{ fact_transactions : "account_id"
+    dim_date "1" <-- "*" fact_transactions : date_id
+    dim_branch "1" <-- "*" fact_transactions : branch_id
+    dim_account "1" <-- "*" fact_transactions : account_id
     
-    dim_date ||--o{ fact_loans : "date_id"
-    dim_branch ||--o{ fact_loans : "branch_id"
-    dim_customer ||--o{ fact_loans : "customer_id"
-    dim_loan_type ||--o{ fact_loans : "loan_type_id"
+    dim_date "1" <-- "*" fact_loans : date_id
+    dim_branch "1" <-- "*" fact_loans : branch_id
+    dim_customer "1" <-- "*" fact_loans : customer_id
+    dim_loan_type "1" <-- "*" fact_loans : loan_type_id
     
-    dim_customer ||--o{ dim_account : "customer_id"
+    dim_customer "1" <-- "*" dim_account : customer_id
+
+    %% Styling: Fact tables in Orange, Dimension tables in Indigo
+    style fact_transactions fill:#ea580c,stroke:#fdba74,stroke-width:2px,color:#fff
+    style fact_loans fill:#ea580c,stroke:#fdba74,stroke-width:2px,color:#fff
+    style dim_date fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
+    style dim_branch fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
+    style dim_customer fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
+    style dim_account fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
+    style dim_loan_type fill:#4f46e5,stroke:#c7d2fe,stroke-width:2px,color:#fff
 ```
 
 ---
