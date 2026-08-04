@@ -6,9 +6,15 @@ The objective of this project is to **create a Banking Analytics Data Warehouse*
 
 ---
 
+## Dataset
+
+This project uses the [PKDD'99 Financial Dataset](https://www.kaggle.com/datasets/siavashraz/1999-czech-financial-dataset) — real anonymized banking data from a Czech bank (1993–1998) containing 4,500 accounts, 5,369 clients, and ~1M transactions. Place the CSV files in the `data/` directory before running the ETL pipeline.
+
+---
+
 ## Data Warehouse Architecture
 
-The architecture follows a standard Kimball Bottom-Up methodology, extracting raw historical data (based on the real-world PKDD'99 Financial Dataset), transforming it via Python, and loading it into a PostgreSQL relational database structured for OLAP.
+The architecture follows a standard Kimball Bottom-Up methodology, extracting raw historical data (based on the real-world [PKDD'99 Financial Dataset](https://www.kaggle.com/datasets/siavashraz/1999-czech-financial-dataset)), transforming it via Python, and loading it into a PostgreSQL relational database structured for OLAP.
 
 ```mermaid
 graph LR
