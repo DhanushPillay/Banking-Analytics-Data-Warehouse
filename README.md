@@ -167,7 +167,7 @@ Set up your Python environment and load the real dataset into the data warehouse
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python scripts/load_real_data.py
+python scripts/etl_pipeline.py
 ```
 
 ### 4. Build the Dashboard
