@@ -1,3 +1,4 @@
+pytest==8.0.0
 kaggle
 greenlet==3.5.4
 numpy==2.5.1
