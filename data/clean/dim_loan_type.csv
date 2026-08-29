@@ -1,0 +1,5 @@
+loan_type_id,loan_type_name,typical_rate_pct
+1,Home,8.5
+2,Personal,12.0
+3,Auto,9.5
+4,Education,7.5

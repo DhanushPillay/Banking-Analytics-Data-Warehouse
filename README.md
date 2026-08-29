@@ -47,78 +47,74 @@ To accommodate both transaction metrics and loan metrics, a **Galaxy Schema** (a
 - `fact_loans`: Tracks disbursed loans, amounts, interest rates, and status (Active/Closed/Defaulted).
 
 ```mermaid
-classDiagram
-    %% Fact Tables (Measurements)
-    class fact_transactions {
-        bigint transaction_id [PK]
+erDiagram
+    %% Fact Tables
+    fact_transactions {
+        bigint transaction_id PK
         numeric amount
         varchar transaction_type
+        int date_id FK
+        int branch_id FK
+        int account_id FK
     }
     
-    class fact_loans {
-        int loan_id [PK]
+    fact_loans {
+        int loan_id PK
         numeric amount
         numeric interest_rate
         varchar status
+        int date_id FK
+        int branch_id FK
+        int customer_id FK
+        int loan_type_id FK
     }
     
-    %% Dimension Tables (Context)
-    class dim_date {
-        int date_id [PK]
+    %% Dimension Tables
+    dim_date {
+        int date_id PK
         date full_date
         int year
         int quarter
         varchar month_name
     }
     
-    class dim_branch {
-        int branch_id [PK]
+    dim_branch {
+        int branch_id PK
         varchar branch_name
         varchar city
         varchar region
     }
     
-    class dim_customer {
-        int customer_id [PK]
+    dim_customer {
+        int customer_id PK
         varchar first_name
         varchar last_name
         varchar age_group
         varchar customer_segment
     }
     
-    class dim_account {
-        int account_id [PK]
+    dim_account {
+        int account_id PK
         varchar account_type
+        int customer_id FK
     }
     
-    class dim_loan_type {
-        int loan_type_id [PK]
+    dim_loan_type {
+        int loan_type_id PK
         varchar loan_type_name
     }
 
-    %% Relationships (Placing facts at the center of the star)
-    fact_transactions "*" --> "1" dim_date : date_id
-    fact_transactions "*" --> "1" dim_branch : branch_id
-    fact_transactions "*" --> "1" dim_account : account_id
+    %% Relationships (One-to-Many Crow's Foot Notation)
+    dim_date ||--o{ fact_transactions : "filters"
+    dim_branch ||--o{ fact_transactions : "filters"
+    dim_account ||--o{ fact_transactions : "filters"
     
-    fact_loans "*" --> "1" dim_date : date_id
-    fact_loans "*" --> "1" dim_branch : branch_id
-    fact_loans "*" --> "1" dim_customer : customer_id
-    fact_loans "*" --> "1" dim_loan_type : loan_type_id
+    dim_date ||--o{ fact_loans : "filters"
+    dim_branch ||--o{ fact_loans : "filters"
+    dim_customer ||--o{ fact_loans : "filters"
+    dim_loan_type ||--o{ fact_loans : "filters"
     
-    dim_account "*" --> "1" dim_customer : customer_id
-
-    %% Aesthetic Premium Styling
-    %% Facts: Deep Violet background with vibrant Purple border
-    style fact_transactions fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
-    style fact_loans fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe
-    
-    %% Dimensions: Deep Cyan background with vibrant Cyan border
-    style dim_date fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
-    style dim_branch fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
-    style dim_customer fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
-    style dim_account fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
-    style dim_loan_type fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#cffafe
+    dim_customer ||--o{ dim_account : "owns"
 ```
 
 ---

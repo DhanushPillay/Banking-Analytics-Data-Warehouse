@@ -1,0 +1,78 @@
+branch_id,branch_name,city,region,branch_type
+1,Hl.m. Praha Branch,Hl.m. Praha,Prague,Urban
+2,Benesov Branch,Benesov,central Bohemia,Rural
+3,Beroun Branch,Beroun,central Bohemia,Rural
+4,Kladno Branch,Kladno,central Bohemia,Urban
+5,Kolin Branch,Kolin,central Bohemia,Rural
+6,Kutna Hora Branch,Kutna Hora,central Bohemia,Rural
+7,Melnik Branch,Melnik,central Bohemia,Rural
+8,Mlada Boleslav Branch,Mlada Boleslav,central Bohemia,Urban
+9,Nymburk Branch,Nymburk,central Bohemia,Rural
+10,Praha - vychod Branch,Praha - vychod,central Bohemia,Rural
+11,Praha - zapad Branch,Praha - zapad,central Bohemia,Rural
+12,Pribram Branch,Pribram,central Bohemia,Urban
+13,Rakovnik Branch,Rakovnik,central Bohemia,Rural
+14,Ceske Budejovice Branch,Ceske Budejovice,south Bohemia,Urban
+15,Cesky Krumlov Branch,Cesky Krumlov,south Bohemia,Rural
+16,Jindrichuv Hradec Branch,Jindrichuv Hradec,south Bohemia,Rural
+17,Pelhrimov Branch,Pelhrimov,south Bohemia,Rural
+18,Pisek Branch,Pisek,south Bohemia,Rural
+19,Prachatice Branch,Prachatice,south Bohemia,Rural
+20,Strakonice Branch,Strakonice,south Bohemia,Rural
+21,Tabor Branch,Tabor,south Bohemia,Urban
+22,Domazlice Branch,Domazlice,west Bohemia,Rural
+23,Cheb Branch,Cheb,west Bohemia,Rural
+24,Karlovy Vary Branch,Karlovy Vary,west Bohemia,Urban
+25,Klatovy Branch,Klatovy,west Bohemia,Rural
+26,Plzen - mesto Branch,Plzen - mesto,west Bohemia,Urban
+27,Plzen - jih Branch,Plzen - jih,west Bohemia,Rural
+28,Plzen - sever Branch,Plzen - sever,west Bohemia,Rural
+29,Rokycany Branch,Rokycany,west Bohemia,Rural
+30,Sokolov Branch,Sokolov,west Bohemia,Rural
+31,Tachov Branch,Tachov,west Bohemia,Rural
+32,Ceska Lipa Branch,Ceska Lipa,north Bohemia,Urban
+33,Decin Branch,Decin,north Bohemia,Urban
+34,Chomutov Branch,Chomutov,north Bohemia,Urban
+35,Jablonec n. Nisou Branch,Jablonec n. Nisou,north Bohemia,Rural
+36,Liberec Branch,Liberec,north Bohemia,Urban
+37,Litomerice Branch,Litomerice,north Bohemia,Urban
+38,Louny Branch,Louny,north Bohemia,Rural
+39,Most Branch,Most,north Bohemia,Urban
+40,Teplice Branch,Teplice,north Bohemia,Urban
+41,Usti nad Labem Branch,Usti nad Labem,north Bohemia,Urban
+42,Havlickuv Brod Branch,Havlickuv Brod,east Bohemia,Rural
+43,Hradec Kralove Branch,Hradec Kralove,east Bohemia,Urban
+44,Chrudim Branch,Chrudim,east Bohemia,Urban
+45,Jicin Branch,Jicin,east Bohemia,Rural
+46,Nachod Branch,Nachod,east Bohemia,Urban
+47,Pardubice Branch,Pardubice,east Bohemia,Urban
+48,Rychnov nad Kneznou Branch,Rychnov nad Kneznou,east Bohemia,Rural
+49,Semily Branch,Semily,east Bohemia,Rural
+50,Svitavy Branch,Svitavy,east Bohemia,Urban
+51,Trutnov Branch,Trutnov,east Bohemia,Urban
+52,Usti nad Orlici Branch,Usti nad Orlici,east Bohemia,Urban
+53,Blansko Branch,Blansko,south Moravia,Urban
+54,Brno - mesto Branch,Brno - mesto,south Moravia,Urban
+55,Brno - venkov Branch,Brno - venkov,south Moravia,Urban
+56,Breclav Branch,Breclav,south Moravia,Urban
+57,Hodonin Branch,Hodonin,south Moravia,Urban
+58,Jihlava Branch,Jihlava,south Moravia,Urban
+59,Kromeriz Branch,Kromeriz,south Moravia,Urban
+60,Prostejov Branch,Prostejov,south Moravia,Urban
+61,Trebic Branch,Trebic,south Moravia,Urban
+62,Uherske Hradiste Branch,Uherske Hradiste,south Moravia,Urban
+63,Vyskov Branch,Vyskov,south Moravia,Rural
+64,Zlin Branch,Zlin,south Moravia,Urban
+65,Znojmo Branch,Znojmo,south Moravia,Urban
+66,Zdar nad Sazavou Branch,Zdar nad Sazavou,south Moravia,Urban
+67,Bruntal Branch,Bruntal,north Moravia,Urban
+68,Frydek - Mistek Branch,Frydek - Mistek,north Moravia,Urban
+69,Jesenik Branch,Jesenik,north Moravia,Rural
+70,Karvina Branch,Karvina,north Moravia,Urban
+71,Novy Jicin Branch,Novy Jicin,north Moravia,Urban
+72,Olomouc Branch,Olomouc,north Moravia,Urban
+73,Opava Branch,Opava,north Moravia,Urban
+74,Ostrava - mesto Branch,Ostrava - mesto,north Moravia,Urban
+75,Prerov Branch,Prerov,north Moravia,Urban
+76,Sumperk Branch,Sumperk,north Moravia,Urban
+77,Vsetin Branch,Vsetin,north Moravia,Urban
