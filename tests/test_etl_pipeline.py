@@ -115,3 +115,40 @@ def test_transform_facts_transactions(mock_raw_data):
     
     assert prijem_trans["transaction_type"] == "Deposit"
     assert vydaj_trans["transaction_type"] == "Withdrawal"
+
+def test_full_dataset_reconciliation():
+    """
+    PROVES ETL ACCURACY:
+    Reads the actual raw CSV files and passes them through the transformation layer,
+    asserting that exactly 0 rows are lost in the process for the core fact and dimension tables.
+    This serves as programmatic proof for the Data Reconciliation table.
+    """
+    from scripts.etl_pipeline import extract_data, transform_dimensions, transform_facts
+    import os
+    
+    # Only run if data directory exists (to avoid breaking CI without data)
+    if not os.path.exists("data/trans.csv") and not os.path.exists("data/trans.asc"):
+        pytest.skip("Raw data not found locally. Skipping full reconciliation test.")
+        
+    # 1. Extract
+    raw_data = extract_data("data")
+    
+    # 2. Transform
+    dims = transform_dimensions(raw_data)
+    facts = transform_facts(raw_data, dims)
+    
+    # 3. Assert (Prove Accuracy / No Data Loss)
+    assert len(facts["fact_transactions"]) == len(raw_data["trans"]), "Transaction row count mismatch!"
+    assert len(facts["fact_loans"]) == len(raw_data["loan"]), "Loan row count mismatch!"
+    assert len(dims["dim_account"]) == len(raw_data["account"]), "Account row count mismatch!"
+    assert len(dims["dim_customer"]) == len(raw_data["client"]), "Customer row count mismatch!"
+    
+    print("\n--- ETL ACCURACY PROVEN ---")
+    print(f"Transactions: {len(raw_data['trans'])} raw -> {len(facts['fact_transactions'])} transformed (100% Match)")
+    print(f"Loans: {len(raw_data['loan'])} raw -> {len(facts['fact_loans'])} transformed (100% Match)")
+
+if __name__ == "__main__":
+    import pytest
+    import sys
+    # When you click "Run" in your IDE, this tells pytest to execute this file and print the output (-s)
+    sys.exit(pytest.main(["-s", "-v", __file__]))
