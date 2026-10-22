@@ -13,7 +13,7 @@ OUTPUT_DIR = ROOT / "outputs"
 MIN_SUPPORT = 0.03
 MIN_CONFIDENCE = 0.10
 MAX_LEN = 3
-DEFAULT_ITEM = "default"
+DEFAULT = "default"
 
 
 def build_baskets() -> pd.DataFrame:
@@ -24,28 +24,24 @@ def build_baskets() -> pd.DataFrame:
     transactions["date"] = pd.to_datetime(transactions["date"], format="%y%m%d")
 
     first_loan = loans.groupby("account_id", as_index=False)["date"].min()
-    transactions = transactions.merge(
-        first_loan, on="account_id", suffixes=("", "_loan")
-    )
-    transactions = transactions[transactions["date"] < transactions["date_loan"]].copy()
+    transactions = transactions.merge(first_loan, on="account_id", suffixes=("", "_loan"))
+    transactions = transactions.loc[transactions["date"] < transactions["date_loan"]]
 
     high_amount = transactions["amount"] > transactions["amount"].quantile(0.75)
-    transaction_flags = pd.DataFrame(
-        {
-            "account_id": transactions["account_id"],
-            "type_PRIJEM": transactions["type"].eq("PRIJEM"),
-            "type_VYDAJ": transactions["type"].eq("VYDAJ"),
-            "type_VYBER": transactions["type"].eq("VYBER"),
-            "high_amount": high_amount,
-            "negative_balance": transactions["balance"] < 0,
-        }
+    flags = transactions.assign(
+        type_PRIJEM=transactions["type"].eq("PRIJEM"),
+        type_VYDAJ=transactions["type"].eq("VYDAJ"),
+        type_VYBER=transactions["type"].eq("VYBER"),
+        high_amount=high_amount,
+        negative_balance=transactions["balance"] < 0,
     )
-
-    baskets = transaction_flags.groupby("account_id").max().astype(bool)
-    default_accounts = set(
-        loans.loc[loans["status"].isin(["B", "D"]), "account_id"]
-    )
-    baskets[DEFAULT_ITEM] = baskets.index.isin(default_accounts)
+    baskets = flags.groupby("account_id")[[
+        "type_PRIJEM", "type_VYDAJ", "type_VYBER", "high_amount", "negative_balance"
+    ]].any()
+    default_accounts = loans.loc[
+        loans["status"].isin(["B", "D"]), "account_id"
+    ]
+    baskets[DEFAULT] = baskets.index.isin(default_accounts)
     return baskets
 
 
@@ -90,12 +86,10 @@ def mine(
         itemsets, metric="confidence", min_threshold=MIN_CONFIDENCE
     )
     rules = rules[
-        rules["consequents"].map(lambda items: set(items) == {DEFAULT_ITEM})
+        rules["consequents"].map(lambda items: set(items) == {DEFAULT})
+        & rules["antecedents"].map(lambda items: DEFAULT not in items)
+        & (rules["lift"] > 1.0)
     ].copy()
-    rules = rules[
-        rules["antecedents"].map(lambda items: DEFAULT_ITEM not in items)
-    ].copy()
-    rules = rules[rules["lift"] > 1.0].copy()
     rules = prune_redundant(rules)
     rules["method"] = method_name
     return itemsets, rules
@@ -103,23 +97,23 @@ def mine(
 
 def main() -> None:
     baskets = build_baskets()
-    apriori_sets, apriori_rules = mine("apriori", apriori, baskets)
-    fp_sets, fp_rules = mine("fpgrowth", fpgrowth, baskets)
+    results = [mine(name, miner, baskets) for name, miner in {
+        "apriori": apriori,
+        "fpgrowth": fpgrowth,
+    }.items()]
 
     OUTPUT_DIR.mkdir(exist_ok=True)
-    pd.concat([apriori_sets, fp_sets], ignore_index=True).to_csv(
+    pd.concat([sets for sets, _ in results], ignore_index=True).to_csv(
         OUTPUT_DIR / "pattern_itemsets.csv", index=False
     )
-    all_rules = pd.concat([apriori_rules, fp_rules], ignore_index=True)
-    all_rules = all_rules.sort_values(
-        ["lift", "confidence", "support"], ascending=False
-    )
+    all_rules = pd.concat([rules for _, rules in results], ignore_index=True)
+    all_rules = all_rules.sort_values(["lift", "confidence", "support"], ascending=False)
     all_rules.to_csv(OUTPUT_DIR / "pattern_rules.csv", index=False)
 
-    print(f"Accounts: {len(baskets)}, defaults: {int(baskets[DEFAULT_ITEM].sum())}")
-    print(f"Apriori itemsets: {len(apriori_sets)}")
-    print(f"FP-Growth itemsets: {len(fp_sets)}")
-    print(f"Default-oriented rules: {len(apriori_rules)} Apriori, {len(fp_rules)} FP-Growth")
+    print(f"Accounts: {len(baskets)}, defaults: {int(baskets[DEFAULT].sum())}")
+    print(f"Apriori itemsets: {len(results[0][0])}")
+    print(f"FP-Growth itemsets: {len(results[1][0])}")
+    print(f"Default-oriented rules: {len(results[0][1])} Apriori, {len(results[1][1])} FP-Growth")
     if not all_rules.empty:
         print(all_rules[["method", "antecedents", "support", "confidence", "lift"]].to_string(index=False))
 
