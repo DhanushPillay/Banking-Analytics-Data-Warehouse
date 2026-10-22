@@ -1,0 +1,10 @@
+[theme]
+base = "light"
+primaryColor = "#3a86ff"
+backgroundColor = "#f7f7f2"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#202124"
+borderColor = "#e4e3db"
+baseRadius = "0.25rem"
+showWidgetBorder = false
+dataframeBorderColor = "#e4e3db"
