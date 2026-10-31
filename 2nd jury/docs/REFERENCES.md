@@ -14,5 +14,4 @@ All sources below are real and verifiable. No other external sources were used; 
 - Jupyter and nbconvert (interactive execution and headless verification): https://jupyter.org
 
 ## Project Context
-- Jury 1 data warehouse built on the same dataset: `banking-dw/README.md` and `banking-dw/docs/5_Project_Report.md`
 - Exam statement defining the Units III and IV deliverables: `2nd jury/Jury 2 stmt.pdf`

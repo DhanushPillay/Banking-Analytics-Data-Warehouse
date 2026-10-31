@@ -8,7 +8,7 @@ Each loan is classified into one of two outcomes: likely to repay (good loan) or
 
 ## 2. Dataset Description and Source
 
-The project uses the PKDD'99 Financial Dataset, real anonymized records of a Czech bank covering 1993 to 1998. The same dataset was used for the Jury 1 data warehouse. Five tables are used:
+The project uses the PKDD'99 Financial Dataset, real anonymized records of a Czech bank covering 1993 to 1998. The raw CSV extracts are read directly; no warehouse or BI layer is part of the pipeline. Five tables are used:
 
 - `loan.csv` (682 rows): one row per granted loan. Columns are loan id, account id, grant date, amount, duration in months, installment amount (`payments`), and status code. Status codes A (finished, no problems) and C (running, no problems) map to good loans (606). Codes B (finished, unpaid) and D (running, in debt) map to defaults (76). The default rate is 11.14 percent, so the classes are imbalanced.
 - `trans.csv` (1,056,320 rows): one row per account transaction from 1993-01-01 to 1998-12-31. Types are PRIJEM (credit, 405,083 rows), VYDAJ (debit, 634,571 rows), and VYBER (cash withdrawal, 16,666 rows). The `operation`, `k_symbol`, `bank`, and `account` columns contain many nulls (183k to 783k), which is expected: they only apply to certain transaction modes. Only the type, amount, balance, account id, and date columns are used for features.
