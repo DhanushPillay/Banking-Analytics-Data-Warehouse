@@ -43,7 +43,9 @@ def mock_raw_data():
             "account_id": [1001, 1002], 
             "date": [930102, 940506], 
             "type": ["PRIJEM", "VYDAJ"], 
-            "amount": [1000.0, 500.0]
+            "operation": ["VKLAD", "VYBER"],
+            "amount": [1000.0, 500.0],
+            "balance": [1000.0, 500.0]
         }),
         "loan": pd.DataFrame({
             "loan_id": [1], 
@@ -51,6 +53,7 @@ def mock_raw_data():
             "date": [940101], 
             "amount": [50000.0], 
             "duration": [12], 
+            "payments": [4500.0],
             "status": ["A"] # A -> Closed
         })
     }
@@ -80,7 +83,7 @@ def test_transform_dimensions_customer_parsing(mock_raw_data):
     assert female_client["gender"] == "Female"
     assert female_client["age"] == 29
     assert female_client["age_group"] == "26-35"
-    assert female_client["customer_segment"] == "Regular"
+    assert female_client["customer_segment"] == "Unsegmented"
     
     # Client 102: Born 1980 -> 1999 - 1980 = 19 years old, Month 01 -> Male
     assert male_client["gender"] == "Male"
@@ -99,8 +102,11 @@ def test_transform_facts_loans(mock_raw_data):
     # Status 'A' maps to 'Closed'
     assert loan["status"] == "Closed"
     assert loan["customer_id"] == 101
+    assert loan["account_id"] == 1001
     assert loan["branch_id"] == 1
-    assert loan["interest_rate"] == 12.0
+    assert loan["payments"] == 4500.0
+    assert loan["status_code"] == "A"
+    assert pd.isna(loan["interest_rate"])
 
 def test_transform_facts_transactions(mock_raw_data):
     """Test transaction type mapping."""
@@ -114,7 +120,10 @@ def test_transform_facts_transactions(mock_raw_data):
     vydaj_trans = fact_transactions[fact_transactions["transaction_id"] == 2].iloc[0]
     
     assert prijem_trans["transaction_type"] == "Deposit"
+    assert prijem_trans["operation"] == "VKLAD"
+    assert prijem_trans["balance"] == 1000.0
     assert vydaj_trans["transaction_type"] == "Withdrawal"
+    assert vydaj_trans["operation"] == "VYBER"
 
 def test_full_dataset_reconciliation():
     """
