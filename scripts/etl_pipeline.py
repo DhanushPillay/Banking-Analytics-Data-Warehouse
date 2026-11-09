@@ -1,15 +1,23 @@
 import os
-import pandas as pd
+from pathlib import Path
+
+import duckdb
 import numpy as np
+import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.sql import text
 
 load_dotenv()
 
-def get_engine():
-    conn_str = f"postgresql+psycopg2://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    return create_engine(conn_str)
+ROOT = Path(__file__).resolve().parent.parent
+LOCAL_DB = ROOT / os.getenv("LOCAL_DB_PATH", "data/banking_dw.duckdb")
+
+
+def get_duckdb():
+    LOCAL_DB.parent.mkdir(parents=True, exist_ok=True)
+    con = duckdb.connect(str(LOCAL_DB))
+    con.execute("CREATE SCHEMA IF NOT EXISTS mart")
+    con.execute("CREATE SCHEMA IF NOT EXISTS analytics")
+    return con
 
 def extract_data(data_dir: str) -> dict:
     """Load raw CSV/ASC files into pandas DataFrames."""
@@ -22,8 +30,8 @@ def extract_data(data_dir: str) -> dict:
             df[f] = pd.read_csv(path, sep=";", low_memory=False)
         except Exception as e:
             print(f"Error loading {f} at {path}: {e}")
-            raise e
-            
+            raise
+
     if "A1" in df["district"].columns and "district_id" not in df["district"].columns:
         df["district"] = df["district"].rename(columns={"A1": "district_id"})
         
@@ -45,16 +53,18 @@ def transform_dimensions(df: dict) -> dict:
     month = bn.str[2:4].astype(int)
     age = 1999 - (bn.str[:2].astype(int) + 1900)
     
+    gender = np.where(month > 50, "Female", "Male")
     dim_customer = pd.DataFrame({
         "customer_id": df["client"]["client_id"],
-        "first_name": "Client", 
+        "first_name": "Client",
         "last_name": df["client"]["client_id"].astype(str),
-        "gender": np.where(month > 50, "Female", "Male"),
+        "gender": gender,
+        "gender_bin": (gender == "Female").astype(int),
         "age": age,
         "age_group": pd.cut(age, bins=[0, 25, 35, 50, 65, 100], labels=["18-25", "26-35", "36-50", "51-65", "65+"]),
         "city": df["client"]["district_id"].map(dict(zip(df["district"]["district_id"], df["district"]["A2"]))),
         "home_branch_id": df["client"]["district_id"],
-        "customer_segment": np.where(age > 50, "Premium", "Regular")
+        "customer_segment": "Unsegmented"
     })
 
     df_acc_full = pd.merge(df["account"], df["disp"][df["disp"]["type"] == "OWNER"], on="account_id")
@@ -68,7 +78,8 @@ def transform_dimensions(df: dict) -> dict:
     
     dim_customer["account_open_date"] = dim_customer["customer_id"].map(dim_account.groupby("customer_id")["open_date"].min()).fillna(pd.to_datetime("1993-01-01"))
 
-    dim_loan_type = pd.DataFrame([(1, "Home", 8.5), (2, "Personal", 12.0), (3, "Auto", 9.5), (4, "Education", 7.5)], columns=["loan_type_id", "loan_type_name", "typical_rate_pct"])
+    # PKDD'99 has no loan product or interest rate. Keep one explicit unknown member.
+    dim_loan_type = pd.DataFrame([(1, "Unspecified", np.nan)], columns=["loan_type_id", "loan_type_name", "typical_rate_pct"])
 
     all_dates = pd.concat([
         pd.to_datetime(df["trans"]["date"].astype(str), format='%y%m%d'), 
@@ -103,25 +114,31 @@ def transform_facts(df: dict, dims: dict) -> dict:
     df_loan_date = pd.to_datetime(df["loan"]["date"].astype(str), format='%y%m%d')
     fact_loans = pd.DataFrame({
         "loan_id": df["loan"]["loan_id"],
+        "account_id": df["loan"]["account_id"],
         "customer_id": df["loan"]["account_id"].map(dict(zip(dim_account["account_id"], dim_account["customer_id"]))),
         "branch_id": df["loan"]["account_id"].map(dict(zip(df["account"]["account_id"], df["account"]["district_id"]))),
-        "loan_type_id": 2, 
+        "loan_type_id": 1,
         "date_id": df_loan_date.dt.strftime("%Y%m%d").astype(int),
         "amount": df["loan"]["amount"],
-        "interest_rate": 12.0,
+        "interest_rate": np.nan,
         "tenure_months": df["loan"]["duration"],
+        "payments": df["loan"]["payments"],
+        "status_code": df["loan"]["status"],
         "status": df["loan"]["status"].map({"A": "Closed", "B": "Defaulted", "C": "Active", "D": "Defaulted"})
-    }).dropna()
+    }).dropna(subset=["customer_id", "branch_id"])
 
     # Process Transactions
     df_trans_date = pd.to_datetime(df["trans"]["date"].astype(str), format='%y%m%d')
     fact_transactions = pd.DataFrame({
         "transaction_id": df["trans"]["trans_id"],
+        "source_row": np.arange(len(df["trans"])),
         "account_id": df["trans"]["account_id"],
         "date_id": df_trans_date.dt.strftime("%Y%m%d").astype(int),
         "branch_id": df["trans"]["account_id"].map(dict(zip(df["account"]["account_id"], df["account"]["district_id"]))),
         "transaction_type": df["trans"]["type"].map({"PRIJEM": "Deposit", "VYDAJ": "Withdrawal", "VYBER": "Withdrawal"}).fillna("Transfer"),
-        "amount": df["trans"]["amount"]
+        "operation": df["trans"]["operation"],
+        "amount": df["trans"]["amount"],
+        "balance": df["trans"]["balance"]
     })
     
     return {
@@ -129,45 +146,41 @@ def transform_facts(df: dict, dims: dict) -> dict:
         "fact_transactions": fact_transactions
     }
 
-def load_data(dims: dict, facts: dict, engine):
-    """Load transformed data into the data warehouse."""
-    os.makedirs("data/clean", exist_ok=True)
-    
-    print("Saving clean data to local files and loading into Postgres...")
-    for name, data in dims.items():
-        data.to_csv(f"data/clean/{name}.csv", index=False)
-    for name, data in facts.items():
-        data.to_csv(f"data/clean/{name}.csv", index=False)
+def load_duckdb(dims: dict, facts: dict, con):
+    """Write dimensions and facts to local DuckDB under the mart schema."""
+    for name, data in {**dims, **facts}.items():
+        con.register(f"frame_{name}", data)
+        con.execute(f"CREATE OR REPLACE TABLE mart.{name} AS SELECT * FROM frame_{name}")
+        con.unregister(f"frame_{name}")
+    con.execute("CHECKPOINT")
 
-    with engine.begin() as conn:
-        conn.execute(text("TRUNCATE TABLE fact_transactions, fact_loans, dim_account, dim_customer, dim_branch, dim_date, dim_loan_type CASCADE;"))
-    
-    # Load dimensions
-    dims["dim_date"].to_sql("dim_date", engine, if_exists="append", index=False)
-    dims["dim_branch"].to_sql("dim_branch", engine, if_exists="append", index=False)
-    dims["dim_customer"].to_sql("dim_customer", engine, if_exists="append", index=False)
-    dims["dim_account"].to_sql("dim_account", engine, if_exists="append", index=False)
-    dims["dim_loan_type"].to_sql("dim_loan_type", engine, if_exists="append", index=False)
-    
-    # Load facts
-    facts["fact_loans"].to_sql("fact_loans", engine, if_exists="append", index=False)
-    facts["fact_transactions"].to_sql("fact_transactions", engine, if_exists="append", index=False, chunksize=50000)
-    
+
+def load_data(dims: dict, facts: dict):
+    """Save CSV snapshots, then load the local DuckDB warehouse."""
+    clean_dir = ROOT / "data" / "clean"
+    clean_dir.mkdir(parents=True, exist_ok=True)
+
+    for name, data in {**dims, **facts}.items():
+        data.to_csv(clean_dir / f"{name}.csv", index=False)
+
+    con = get_duckdb()
+    load_duckdb(dims, facts, con)
+    con.close()
+    print(f"Loaded into DuckDB: {LOCAL_DB}")
     print("Done. Data loaded successfully.")
 
+
 def main():
-    data_dir = "data"
     print("Extracting Data...")
-    raw_data = extract_data(data_dir)
-    
+    raw_data = extract_data(str(ROOT / "data"))
+
     print("Transforming Dimensions...")
     dims = transform_dimensions(raw_data)
-    
+
     print("Transforming Facts...")
     facts = transform_facts(raw_data, dims)
-    
-    engine = get_engine()
-    load_data(dims, facts, engine)
+
+    load_data(dims, facts)
 
 if __name__ == "__main__":
     main()
