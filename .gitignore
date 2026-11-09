@@ -2,15 +2,20 @@ venv/
 .env
 __pycache__/
 *.pyc
-
-data/clean/
-main_tex
-presentation
-
-# Jury 2: version code/docs/outputs, keep heavy data and local tooling out
-.venv/
-.kilo/
+.pytest_cache/
+.playwright-mcp/
+.ruff_cache/
 .opencode/
-2nd jury/data/clean/
-2nd jury/data/trans.csv
-2nd jury/docs/jury2-architecture.html
+
+# Local warehouse and generated snapshots
+data/banking_dw.duckdb
+data/banking_dw.duckdb.wal
+data/clean/
+
+# Notes and scratch output
+presentation/
+
+# Deliverable folders handled outside the app build
+PPT/
+reports/
+powerbi/
