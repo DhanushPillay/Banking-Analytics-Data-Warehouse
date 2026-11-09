@@ -112,61 +112,30 @@ def data_model_page() -> None:
     section("Galaxy schema", "Two fact tables share five conformed dimensions")
     st.graphviz_chart(galaxy_dot(counts), width="stretch")
     st.caption(
-        "One fact table plus its dimensions is a star. Two fact tables sharing conformed "
-        "account, branch, and date keys make it a galaxy."
+        "Blue nodes are fact tables, light nodes are dimensions, and edge labels are join "
+        "keys. One fact plus its dimensions is a star; two facts sharing conformed account, "
+        "branch, and date keys make the pair a galaxy."
     )
 
-    section("Entities", "Row counts read live from DuckDB")
-    sizes = dict(zip(counts["table"], counts["rows"]))
-    entities = pd.DataFrame(
-        [
-            {
-                "Table": f"mart.{table}",
-                "Role": "Dimension" if table.startswith("dim_") else "Fact",
-                "Grain": SCHEMA[table][1],
-                "Purpose": SCHEMA[table][2],
-                "Key": SCHEMA[table][0],
-                "Rows": int(sizes[table]),
-                "Columns": int((columns["table_name"] == table).sum()),
-            }
-            for table in counts["table"]
-        ]
-    )
-    grid(
-        entities,
-        {
-            "Rows": st.column_config.NumberColumn(format="%d"),
-            "Columns": st.column_config.NumberColumn(format="%d"),
-        },
-    )
+    with st.expander("Column dictionary"):
+        st.markdown("Pick a mart table to inspect its columns and keys.")
+        chosen = st.selectbox("Table", counts["table"].tolist())
+        table_columns = columns[columns["table_name"] == chosen].copy()
+        foreign = {(src, key) for src, key, _ in FOREIGN_KEYS}
 
-    section("Relationships", "Every join used by the feature build and the app")
-    relationships = pd.DataFrame(
-        [(src, key, dst, SCHEMA[dst][0], "many to one") for src, key, dst in FOREIGN_KEYS],
-        columns=["From table", "From key", "To table", "To key", "Cardinality"],
-    )
-    relationships["From table"] = "mart." + relationships["From table"]
-    relationships["To table"] = "mart." + relationships["To table"]
-    grid(relationships)
+        def key_role(row) -> str:
+            if SCHEMA[chosen][0] == row["column_name"]:
+                return "Primary key"
+            if (chosen, row["column_name"]) in foreign:
+                return "Foreign key"
+            return "Attribute"
 
-    section("Column dictionary", "Pick a mart table to inspect its columns and keys")
-    chosen = st.selectbox("Table", counts["table"].tolist())
-    table_columns = columns[columns["table_name"] == chosen].copy()
-    foreign = {(src, key) for src, key, _ in FOREIGN_KEYS}
-
-    def key_role(row) -> str:
-        if SCHEMA[chosen][0] == row["column_name"]:
-            return "Primary key"
-        if (chosen, row["column_name"]) in foreign:
-            return "Foreign key"
-        return "Attribute"
-
-    table_columns["Key"] = table_columns.apply(key_role, axis=1)
-    grid(
-        table_columns[["column_name", "data_type", "Key"]].rename(
-            columns={"column_name": "Column", "data_type": "Type"}
+        table_columns["Key"] = table_columns.apply(key_role, axis=1)
+        grid(
+            table_columns[["column_name", "data_type", "Key"]].rename(
+                columns={"column_name": "Column", "data_type": "Type"}
+            )
         )
-    )
 
     section("Analytics layer", "Derived tables loaded into the same database")
     chart_frame = (
@@ -177,7 +146,8 @@ def data_model_page() -> None:
         .head(10)
     )
     show(row_count_chart(chart_frame))
-    grid(analytics_frame, {"Rows": st.column_config.NumberColumn(format="%d")})
+    with st.expander("All analytics tables"):
+        grid(analytics_frame, {"Rows": st.column_config.NumberColumn(format="%d")})
 
     note(
         "Two facts, five dimensions, and ten foreign-key joins. `dim_loan_type` holds one "
