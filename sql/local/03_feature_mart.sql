@@ -74,26 +74,26 @@ SELECT
     l.loan_date AS parsed_date,
     l.target,
     l.client_id,
-    a.n_txn,
-    a.n_deposit,
-    a.n_withdrawal,
-    a.sum_deposit,
-    a.sum_withdrawal,
+    COALESCE(a.n_txn, 0) AS n_txn,
+    COALESCE(a.n_deposit, 0) AS n_deposit,
+    COALESCE(a.n_withdrawal, 0) AS n_withdrawal,
+    COALESCE(a.sum_deposit, 0) AS sum_deposit,
+    COALESCE(a.sum_withdrawal, 0) AS sum_withdrawal,
     a.avg_amount,
     a.std_amount,
     a.avg_balance,
     a.min_balance,
     a.max_balance,
     b.balance_at_loan,
-    GREATEST(date_diff('day', f.first_txn_date, l.loan_date) / 30.44, 1 / 30.44) AS months_active,
-    a.n_txn / GREATEST(date_diff('day', f.first_txn_date, l.loan_date) / 30.44, 1 / 30.44) AS txn_per_month,
+    COALESCE(GREATEST(date_diff('day', f.first_txn_date, l.loan_date) / 30.44, 1 / 30.44), 0) AS months_active,
+    COALESCE(a.n_txn / GREATEST(date_diff('day', f.first_txn_date, l.loan_date) / 30.44, 1 / 30.44), 0) AS txn_per_month,
     c.gender,
     c.age,
     c.home_branch_id AS district_id,
     c.gender_bin
 FROM loans l
-JOIN agg a ON a.loan_id = l.loan_id
-JOIN last_balance b ON b.loan_id = l.loan_id
-JOIN first_date f ON f.loan_id = l.loan_id
+LEFT JOIN agg a ON a.loan_id = l.loan_id
+LEFT JOIN last_balance b ON b.loan_id = l.loan_id
+LEFT JOIN first_date f ON f.loan_id = l.loan_id
 JOIN mart.dim_customer c ON c.customer_id = l.client_id
 ORDER BY l.loan_id;
