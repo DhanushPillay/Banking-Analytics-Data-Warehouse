@@ -23,20 +23,19 @@ import streamlit as st
 
 from data_access import (
     data_source_label,
+    query,
     read_table,
     snowflake_enabled,
     snowflake_leakage,
     table_counts as db_table_counts,
-    transactions_for_audit,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
 CLEAN = DATA / "clean"
 ARTIFACTS = ROOT / "artifacts"
-MODELS = ARTIFACTS / "models"
+MODEL_DIR = ARTIFACTS / "models"
 
-PAPER = "#fbfaf7"
 INK = "#191b1f"
 MUTED = "#6b6f76"
 RULE = "#e4e1d8"
@@ -65,13 +64,13 @@ SIM_INPUTS = {
 }
 
 SCHEMA = {
-    "dim_date": ("date_id", "One row per calendar day", "Conformed date dimension"),
-    "dim_branch": ("branch_id", "One row per branch district", "Conformed branch dimension"),
-    "dim_customer": ("customer_id", "One row per client", "Customer profile"),
-    "dim_account": ("account_id", "One row per account", "Account and owner"),
-    "dim_loan_type": ("loan_type_id", "One row per loan product", "Single unknown member"),
-    "fact_loans": ("loan_id", "One row per loan", "Loan disbursement fact"),
-    "fact_transactions": ("transaction_id", "One row per transaction", "Account movement fact"),
+    "dim_date": "date_id",
+    "dim_branch": "branch_id",
+    "dim_customer": "customer_id",
+    "dim_account": "account_id",
+    "dim_loan_type": "loan_type_id",
+    "fact_loans": "loan_id",
+    "fact_transactions": "transaction_id",
 }
 
 FOREIGN_KEYS = [
@@ -96,15 +95,6 @@ def stress_text(key: str, value: float) -> str:
     if key == "duration":
         return f"{value:.0f} months"
     return f"{value:.1f} per month"
-
-PAGES = [
-    "Executive overview",
-    "Data & leakage",
-    "Models",
-    "Patterns",
-    "Simulator",
-    "Data model card",
-]
 
 THEME_CSS = """
     <style>
@@ -172,40 +162,27 @@ def apply_theme() -> None:
 # ---------------------------------------------------------------- data access
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)
 def load_features() -> pd.DataFrame:
     fallback = DATA / "features" / "loan_features.csv"
     return read_table("analytics.loan_features", fallback)
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)
 def load_output(name: str) -> pd.DataFrame | None:
-    table = f"analytics.{Path(name).stem}"
-    for folder in ("", "metrics", "segments", "rules", "features"):
-        path = ARTIFACTS / folder / name
-        if path.exists():
-            try:
-                return read_table(table, path)
-            except Exception:
-                return pd.read_csv(path)
-    return None
+    path = next(ARTIFACTS.rglob(name), None)
+    if path is None:
+        return None
+    return read_table(f"analytics.{Path(name).stem}", path)
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)
 def load_scores() -> pd.DataFrame:
     return read_table("analytics.model_scores", ARTIFACTS / "metrics" / "model_scores.csv")
 
 
-@st.cache_data(show_spinner="Reading transactions...")
-def load_transactions() -> pd.DataFrame:
-    try:
-        return transactions_for_audit()
-    except Exception:
-        return pd.read_csv(CLEAN / "fact_transactions.csv", usecols=["account_id", "date_id"])
-
-
-@st.cache_data(show_spinner=False)
-def table_counts() -> pd.DataFrame:
+@st.cache_data(show_spinner=False, ttl=600)
+def mart_counts() -> pd.DataFrame:
     try:
         return db_table_counts()
     except Exception:
@@ -216,33 +193,38 @@ def table_counts() -> pd.DataFrame:
         return pd.DataFrame(rows)
 
 
+@st.cache_data(show_spinner=False, ttl=600)
+def transaction_summary() -> dict:
+    row = query(
+        "SELECT MIN(date_id) AS min_date, MAX(date_id) AS max_date, "
+        "COUNT(*) AS total, COUNT(DISTINCT account_id) AS accounts "
+        "FROM mart.fact_transactions"
+    ).iloc[0]
+    return {
+        "min_date": int(row["min_date"]),
+        "max_date": int(row["max_date"]),
+        "total": int(row["total"]),
+        "accounts": int(row["accounts"]),
+    }
+
+
 @st.cache_resource(show_spinner=False)
 def load_model():
-    return joblib.load(MODELS / "best_GradientBoosting_baseline_tuned.pkl")
+    return joblib.load(MODEL_DIR / "best_GradientBoosting_baseline_tuned.pkl")
 
 
-@st.cache_data(show_spinner="Checking transaction cutoff...")
+@st.cache_data(show_spinner="Checking transaction cutoff...", ttl=600)
 def leakage_audit() -> pd.DataFrame:
     if snowflake_enabled():
         return snowflake_leakage()
-
-    features = load_features()
-    transactions = load_transactions()
-    cuts = pd.to_datetime(features["parsed_date"]).dt.strftime("%Y%m%d").astype(int)
-    grouped = {
-        account: np.sort(frame["date_id"].to_numpy())
-        for account, frame in transactions.groupby("account_id")
-    }
-    rows = []
-    for loan_id, account, cut, n_txn in zip(
-        features["loan_id"], features["account_id"], cuts, features["n_txn"]
-    ):
-        dates = grouped.get(account)
-        used = int(np.searchsorted(dates, cut, side="left")) if dates is not None else 0
-        total = int(dates.size) if dates is not None else 0
-        rows.append((loan_id, account, cut, n_txn, used, total))
-    return pd.DataFrame(
-        rows, columns=["loan_id", "account_id", "cutoff", "n_txn", "used", "total"]
+    return query(
+        "SELECT f.loan_id, f.account_id, f.loan_date_id AS cutoff, f.n_txn, "
+        "COUNT(t.date_id) FILTER (WHERE t.date_id < f.loan_date_id) AS used, "
+        "COUNT(t.date_id) AS total "
+        "FROM analytics.loan_features f "
+        "LEFT JOIN mart.fact_transactions t ON t.account_id = f.account_id "
+        "GROUP BY f.loan_id, f.account_id, f.loan_date_id, f.n_txn "
+        "ORDER BY f.loan_id"
     )
 
 
@@ -283,7 +265,17 @@ def note(text: str, label: str = "Finding", kind: str = "") -> None:
 
 
 def show(chart) -> None:
-    st.altair_chart(chart.properties(width="container"), width="stretch")
+    st.altair_chart(chart, width="stretch")
+
+
+def ref_rule(value: float, axis: str = "x", color: str = INK, dash=(4, 3), width: int = 1):
+    field = "x" if axis == "x" else "y"
+    rule = alt.Chart(pd.DataFrame({field: [value]})).mark_rule(
+        color=color,
+        strokeWidth=width,
+        **({"strokeDash": list(dash)} if dash else {}),
+    )
+    return rule.encode(x="x:Q") if axis == "x" else rule.encode(y="y:Q")
 
 
 def grid(frame: pd.DataFrame, config: dict | None = None) -> None:
@@ -322,9 +314,12 @@ def model_columns(model, features: pd.DataFrame) -> list[str]:
     return [column for column in features.columns if column not in DROP]
 
 
-def median_row(features: pd.DataFrame) -> pd.Series:
+def median_row(features: pd.DataFrame, columns: list[str]) -> pd.Series:
     base = features.drop(columns=[column for column in DROP if column in features.columns])
-    return base.median(numeric_only=True)
+    missing = [column for column in columns if column not in base.columns]
+    if missing:
+        raise KeyError(f"Missing model features: {missing}")
+    return base[columns].median(numeric_only=True)
 
 
 def applicant_row(base: pd.Series, values: dict) -> pd.Series:
@@ -339,12 +334,28 @@ def applicant_row(base: pd.Series, values: dict) -> pd.Series:
 
 
 def predict(model, row: pd.Series, columns: list[str]) -> float:
-    frame = pd.DataFrame([row[columns].astype(float).to_numpy()], columns=columns)
+    frame = pd.DataFrame([row[columns].astype(float)], columns=columns)
     return float(model.predict_proba(frame)[0, 1])
 
 
-def cutoff_stats(scores: pd.DataFrame, features: pd.DataFrame, cutoff: float) -> dict:
-    data = scores.merge(features[["loan_id", "amount"]], on="loan_id", how="left")
+def scored_frame(scores: pd.DataFrame, features: pd.DataFrame) -> pd.DataFrame:
+    return scores.merge(features[["loan_id", "amount"]], on="loan_id", how="left")
+
+
+def cutoff_stats(data: pd.DataFrame, cutoff: float) -> dict:
+    if data.empty:
+        return {
+            "flagged": 0,
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "tn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "exposure": 0.0,
+            "defaults": 0,
+            "total": 0,
+        }
     flagged = data["prob_default"] >= cutoff
     is_default = data["target"] == 1
     tp = int((flagged & is_default).sum())
@@ -403,19 +414,9 @@ def score_distribution(scores: pd.DataFrame, cutoff: float, applicant: float | N
         .mark_rect(color=RISK, opacity=0.07)
         .encode(x="x:Q", x2="x2:Q", y="y:Q", y2="y2:Q")
     )
-    layers = [
-        shade,
-        bars,
-        alt.Chart(pd.DataFrame({"x": [cutoff]}))
-        .mark_rule(color=INK, strokeDash=[4, 3])
-        .encode(x="x:Q"),
-    ]
+    layers = [shade, bars, ref_rule(cutoff)]
     if applicant is not None:
-        layers.append(
-            alt.Chart(pd.DataFrame({"x": [applicant]}))
-            .mark_rule(color=RISK, strokeWidth=2)
-            .encode(x="x:Q")
-        )
+        layers.append(ref_rule(applicant, color=RISK, dash=(), width=2))
     return alt.layer(*layers).properties(height=220).interactive()
 
 
@@ -530,12 +531,9 @@ def quintile_figure(features: pd.DataFrame, column: str, label: str):
     text = alt.Chart(frame).mark_text(dy=-6, fontSize=9).encode(
         x="Quintile:N", y="Default rate:Q", text=alt.Text("Default rate:Q", format=".1%")
     )
-    rule = (
-        alt.Chart(pd.DataFrame({"y": [base_rate]}))
-        .mark_rule(color=MUTED, strokeDash=[3, 3])
-        .encode(y="y:Q")
-    )
-    return (base + text + rule).properties(height=280).interactive()
+    return (base + text + ref_rule(base_rate, axis="y", color=MUTED, dash=(3, 3))).properties(
+        height=280
+    ).interactive()
 
 
 def heatmap_figure(table: pd.DataFrame, labels: list[str], row_labels: list[str]):
@@ -577,8 +575,7 @@ def driver_figure(labels: list[str], deltas: list[float]):
         color=alt.condition(alt.datum.Delta > 0, alt.value(RISK), alt.value(GOOD)),
         tooltip=["Driver", alt.Tooltip("Delta:Q", format="+.1f")],
     )
-    rule = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color=RULE).encode(x="x:Q")
-    return (bars + rule).properties(height=280).interactive()
+    return (bars + ref_rule(0, color=RULE, dash=())).properties(height=280).interactive()
 
 
 def leakage_figure(used: int, excluded: int):
@@ -640,14 +637,12 @@ def cluster_rate_figure(profiles: pd.DataFrame, base_rate: float):
         color=alt.condition(alt.datum.Rate > base_rate * 100, alt.value(RISK), alt.value(ACCENT)),
         tooltip=["Label", alt.Tooltip("Rate:Q", format=".1f")],
     )
-    rule = alt.Chart(pd.DataFrame({"y": [base_rate * 100]})).mark_rule(
-        color=MUTED, strokeDash=[3, 3]
-    ).encode(y="y:Q")
     text = alt.Chart(frame).mark_text(dy=-6, fontSize=9).encode(
         x=alt.X("Label:N", sort=labels, scale=alt.Scale(domain=labels)),
         y="Rate:Q",
         text=alt.Text("Rate:Q", format=".1f"),
     )
+    rule = ref_rule(base_rate * 100, axis="y", color=MUTED, dash=(3, 3))
     return (bars + rule + text).properties(height=300).interactive()
 
 
@@ -729,19 +724,13 @@ def roc_pr_frames() -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(roc_rows), pd.DataFrame(pr_rows)
 
 
-def confusion_figure(scores: pd.DataFrame, cutoff: float):
-    flagged = scores["prob_default"] >= cutoff
-    actual = scores["target"] == 1
+def confusion_figure(data: pd.DataFrame, cutoff: float, stats: dict | None = None):
+    stats = stats or cutoff_stats(data, cutoff)
     frame = pd.DataFrame(
         {
             "Actual": ["Default", "Default", "Repaid", "Repaid"],
             "Flagged": ["Flagged", "Not flagged", "Flagged", "Not flagged"],
-            "Count": [
-                int((flagged & actual).sum()),
-                int((~flagged & actual).sum()),
-                int((flagged & ~actual).sum()),
-                int((~flagged & ~actual).sum()),
-            ],
+            "Count": [stats["tp"], stats["fn"], stats["fp"], stats["tn"]],
         }
     )
     base = alt.Chart(frame).encode(
@@ -763,7 +752,7 @@ def confusion_figure(scores: pd.DataFrame, cutoff: float):
     return (rect + text).properties(height=200).interactive()
 
 
-def sidebar(features: pd.DataFrame) -> str:
+def sidebar(features: pd.DataFrame) -> None:
     st.sidebar.markdown('<div class="brand">Loan default review</div>', unsafe_allow_html=True)
     st.sidebar.markdown(
         '<div class="brand-sub">PKDD\'99 banking records<br>Pre-loan behaviour only</div>',
@@ -774,7 +763,6 @@ def sidebar(features: pd.DataFrame) -> str:
         f'<div class="side-line"><span>Analytics</span><span>{data_source_label()}</span></div>',
         unsafe_allow_html=True,
     )
-    page = st.sidebar.radio("View", PAGES, label_visibility="collapsed")
     st.sidebar.markdown('<div class="side-label">Corpus</div>', unsafe_allow_html=True)
     defaults = int(features["target"].sum())
     rows = [
@@ -787,4 +775,3 @@ def sidebar(features: pd.DataFrame) -> str:
             f'<div class="side-line"><span>{label}</span><span>{value}</span></div>',
             unsafe_allow_html=True,
         )
-    return page
