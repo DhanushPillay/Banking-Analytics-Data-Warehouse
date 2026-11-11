@@ -83,40 +83,47 @@ def connect_snowflake():
         )
 
 
-conn = connect_snowflake()
-cursor = conn.cursor()
+def main() -> None:
+    conn = connect_snowflake()
+    try:
+        cursor = conn.cursor()
+        for rel, (table, sep, renames, drop) in FILES.items():
+            df = pd.read_csv(ROOT / rel, sep=sep, low_memory=False)
+            df = df.rename(columns=renames).drop(columns=drop, errors="ignore")
+            df.columns = [str(column).upper() for column in df.columns]
+            if "PARSED_DATE" in df.columns:
+                df["PARSED_DATE"] = pd.to_datetime(
+                    df["PARSED_DATE"], errors="coerce"
+                ).dt.date
 
-for rel, (table, sep, renames, drop) in FILES.items():
-    df = pd.read_csv(ROOT / rel, sep=sep, low_memory=False)
-    df = df.rename(columns=renames).drop(columns=drop, errors="ignore")
-    df.columns = [str(column).upper() for column in df.columns]
-    if "PARSED_DATE" in df.columns:
-        df["PARSED_DATE"] = pd.to_datetime(df["PARSED_DATE"], errors="coerce").dt.date
+            cursor.execute(
+                f"SELECT COLUMN_NAME FROM {database}.INFORMATION_SCHEMA.COLUMNS "
+                "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s ORDER BY ORDINAL_POSITION",
+                (schema, table),
+            )
+            expected = [row[0] for row in cursor.fetchall()]
+            missing = set(expected) - set(df.columns)
+            extra = set(df.columns) - set(expected)
+            if missing or extra:
+                raise SystemExit(
+                    f"{table}: missing={sorted(missing)} extra={sorted(extra)}"
+                )
 
-    cursor.execute(
-        f"SELECT COLUMN_NAME FROM {database}.INFORMATION_SCHEMA.COLUMNS "
-        "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s ORDER BY ORDINAL_POSITION",
-        (schema, table),
-    )
-    expected = [row[0] for row in cursor.fetchall()]
-    missing = set(expected) - set(df.columns)
-    extra = set(df.columns) - set(expected)
-    if missing or extra:
-        raise SystemExit(
-            f"{table}: missing={sorted(missing)} extra={sorted(extra)}"
-        )
+            ok, _, nrows, _ = write_pandas(
+                conn,
+                df,
+                table,
+                schema=schema,
+                chunk_size=100_000,
+                auto_create_table=False,
+            )
+            if not ok:
+                raise SystemExit(f"{table}: write failed")
+            print(f"{table}: {nrows} rows")
+    finally:
+        conn.close()
+    print("upload complete")
 
-    ok, _, nrows, _ = write_pandas(
-        conn,
-        df,
-        table,
-        schema=schema,
-        chunk_size=100_000,
-        auto_create_table=False,
-    )
-    if not ok:
-        raise SystemExit(f"{table}: write failed")
-    print(f"{table}: {nrows} rows")
 
-conn.close()
-print("upload complete")
+if __name__ == "__main__":
+    main()
