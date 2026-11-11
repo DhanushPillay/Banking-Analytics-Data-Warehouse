@@ -1,17 +1,34 @@
 """Data and leakage page."""
 
-from components.common import *
+import pandas as pd
+import streamlit as st
+
+from components.common import (
+    kpi_row,
+    leakage_audit,
+    leakage_figure,
+    load_features,
+    mart_counts,
+    note,
+    page_header,
+    percent,
+    row_count_chart,
+    section,
+    show,
+    transaction_summary,
+)
 
 
 def data_page() -> None:
     features = load_features()
-    counts = table_counts()
+    counts = mart_counts()
     audit = leakage_audit()
+    summary = transaction_summary()
     matches = int((audit["used"] == audit["n_txn"]).sum())
 
     page_header(
         "Data",
-        "1,056,320 transactions, 682 loans, no lookahead",
+        f"{summary['total']:,} transactions, {len(features):,} loans, no lookahead",
         "The modelling table is built from the local DuckDB galaxy schema. One rule keeps it "
         "honest: every transaction used for a loan happened strictly before the loan date.",
     )
@@ -22,7 +39,12 @@ def data_page() -> None:
         lambda name: "Fact" if name.startswith("fact_") else "Dimension"
     )
     show(row_count_chart(schema, "Table", "Rows", "Role"))
-    grid(schema, {"Rows": st.column_config.NumberColumn(format="%d")})
+    st.dataframe(
+        schema,
+        hide_index=True,
+        width="stretch",
+        column_config={"Rows": st.column_config.NumberColumn(format="%d")},
+    )
 
     section("Leakage check", "Pick a loan; the split is computed from fact_transactions")
     loan_dates = dict(zip(features["loan_id"], features["parsed_date"]))
@@ -32,7 +54,11 @@ def data_page() -> None:
         options=features["loan_id"].tolist(),
         format_func=lambda value: f"{value} | {loan_dates[value]} | {loan_amounts[value]:,.0f} CZK",
     )
-    chosen = audit[audit["loan_id"] == loan_id].iloc[0]
+    chosen_rows = audit[audit["loan_id"] == loan_id]
+    if chosen_rows.empty:
+        st.warning("This loan is missing from the leakage audit.")
+        return
+    chosen = chosen_rows.iloc[0]
     excluded = int(chosen["total"] - chosen["used"])
     kpi_row(
         [
@@ -52,8 +78,8 @@ def data_page() -> None:
 
     note(
         f"Across all {len(features)} loans, n_txn equals the count of transactions strictly before "
-        f"the loan date: {matches} of {len(features)} match, and no same-day transaction is used. "
-        "This is the check that separates a pre-loan model from a leaked one.",
+        f"the loan date: {matches} of {len(features)} match. The audit counts only "
+        "`date_id < loan_date_id`, so same-day rows are excluded by construction.",
         label="Verified",
     )
 
@@ -73,7 +99,12 @@ def data_page() -> None:
     st.dataframe(provenance, hide_index=True, width="stretch")
 
     section("Quality checks", "Computed from the modelling table")
-    transactions = load_transactions()
+    account_rows = counts.loc[counts["table"] == "dim_account", "rows"]
+    account_note = (
+        f"Of {int(account_rows.iloc[0]):,} accounts"
+        if not account_rows.empty
+        else "Distinct accounts"
+    )
     checks = pd.DataFrame(
         [
             ["Rows", f"{len(features):,}", "One per loan"],
@@ -81,12 +112,10 @@ def data_page() -> None:
             ["Missing cells", f"{int(features.isna().sum().sum())}", "None"],
             ["Duplicate loan ids", f"{int(features['loan_id'].duplicated().sum())}", "None"],
             ["Defaults", f"{int(features['target'].sum())}", percent(features["target"].mean())],
-            ["Transaction dates", f"{int(transactions['date_id'].min())} to {int(transactions['date_id'].max())}", "Six years"],
-            ["Accounts with transactions", f"{transactions['account_id'].nunique():,}", "Of 4,500 accounts"],
+            ["Transaction dates", f"{summary['min_date']} to {summary['max_date']}", "From fact_transactions"],
+            ["Transactions", f"{summary['total']:,}", "Before and after loans"],
+            ["Accounts with transactions", f"{summary['accounts']:,}", account_note],
         ],
         columns=["Check", "Result", "Note"],
     )
     st.dataframe(checks, hide_index=True, width="stretch")
-
-
-# --------------------------------------------------------------------- models
