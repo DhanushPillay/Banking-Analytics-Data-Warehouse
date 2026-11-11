@@ -1,6 +1,28 @@
 """Simulator page."""
 
-from components.common import *
+import pandas as pd
+import streamlit as st
+
+from components.common import (
+    SIM_INPUTS,
+    applicant_row,
+    driver_figure,
+    grid,
+    load_features,
+    load_model,
+    load_scores,
+    median_row,
+    model_columns,
+    money,
+    note,
+    page_header,
+    predict,
+    score_config,
+    score_distribution,
+    section,
+    show,
+    stress_text,
+)
 
 
 def simulator_page() -> None:
@@ -8,13 +30,14 @@ def simulator_page() -> None:
     scores = load_scores()
     model = load_model()
     columns = model_columns(model, features)
-    base = median_row(features)
+    base = median_row(features, columns)
 
     page_header(
         "Simulator",
         "Score one application against the fitted model",
         "The model is the tuned Gradient Boosting pipeline in artifacts/models. Five inputs are "
-        "yours; the other thirteen features are held at portfolio medians and listed in full below.",
+        f"yours; the other {len(columns) - len(SIM_INPUTS)} features are held at portfolio "
+        "medians and listed in full below.",
     )
 
     left, right = st.columns([1, 1.05], gap="large")
@@ -103,7 +126,10 @@ def simulator_page() -> None:
             "1st percentile for balances and activity) and holds the rest at your entries."
         )
 
-    section("What the model sees", "All 18 features, applicant value against the portfolio median")
+    section(
+        "What the model sees",
+        f"All {len(columns)} features, applicant value against the portfolio median",
+    )
     with st.expander("Open the full feature vector", expanded=False):
         vector = pd.DataFrame(
             {
@@ -119,9 +145,9 @@ def simulator_page() -> None:
 
     note(
         "payments is derived as amount ÷ duration, exactly as in the feature build, so it is not "
-        "an independent input. The pipeline was fitted on all 682 loans; the portfolio page uses "
-        "out-of-fold scores. Use this page to compare applications, not to read a calibrated "
-        "probability.",
+        "an independent input. The pipeline was fitted on all "
+        f"{len(features):,} loans; the portfolio page uses out-of-fold scores. Use this page to "
+        "compare applications, not to read a calibrated probability.",
         label="Method",
     )
 
