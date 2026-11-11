@@ -22,6 +22,8 @@ from sklearn.cluster import AgglomerativeClustering, DBSCAN
 from sklearn.metrics import (
     average_precision_score,
     f1_score,
+    pairwise_distances,
+    precision_recall_curve,
     precision_score,
     recall_score,
     roc_auc_score,
@@ -32,8 +34,10 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+from etl_pipeline import LOCAL_DB
+
 ROOT = Path(__file__).resolve().parent.parent
-DB = ROOT / "data" / "banking_dw.duckdb"
+DB = LOCAL_DB
 ARTIFACTS = ROOT / "artifacts"
 SEED = 42
 
@@ -68,21 +72,20 @@ BIN_SPECS = {
 
 
 def load_features() -> pd.DataFrame:
-    if DB.exists():
-        con = duckdb.connect(str(DB), read_only=True)
-        frame = con.execute("SELECT * FROM analytics.loan_features").fetchdf()
-        con.close()
-        return frame
-    return pd.read_csv(ROOT / "data" / "features" / "loan_features.csv")
+    if not DB.exists():
+        raise FileNotFoundError(f"Local database not built: {DB}")
+    con = duckdb.connect(str(DB), read_only=True)
+    frame = con.execute("SELECT * FROM analytics.loan_features").fetchdf()
+    con.close()
+    return frame
 
 
 def scores_at_threshold(y_true: pd.Series, scores: np.ndarray) -> dict:
-    best = {"threshold": 0.5, "f1": -1.0}
-    for threshold in np.arange(0.05, 0.96, 0.01):
-        f1 = f1_score(y_true, scores >= threshold, zero_division=0)
-        if f1 > best["f1"]:
-            best = {"threshold": float(threshold), "f1": float(f1)}
-    threshold = best["threshold"]
+    precision, recall, thresholds = precision_recall_curve(y_true, scores)
+    f1 = 2 * precision[:-1] * recall[:-1] / np.maximum(
+        precision[:-1] + recall[:-1], 1e-12
+    )
+    threshold = float(thresholds[int(np.nanargmax(f1))])
     predicted = scores >= threshold
     return {
         "threshold": threshold,
@@ -189,30 +192,34 @@ def k_medoids(distance: np.ndarray, k: int, seed: int = SEED) -> np.ndarray:
     return np.argmin(distance[:, medoids], axis=1)
 
 
-def best_k(scaled: np.ndarray, fit) -> int:
-    scores = {k: silhouette_score(scaled, fit(k)) for k in range(2, 6)}
-    return max(scores, key=scores.get)
+def best_k(scaled: np.ndarray, fit) -> tuple[int, np.ndarray]:
+    best = (-1.0, 2, np.zeros(len(scaled), dtype=int))
+    for k in range(2, 6):
+        labels = fit(k)
+        silhouette = silhouette_score(scaled, labels)
+        if silhouette > best[0]:
+            best = (silhouette, k, labels)
+    return best[1], best[2]
 
 
 def run_clusters(x: pd.DataFrame, loan_ids: pd.Series, y: pd.Series) -> tuple[pd.DataFrame, pd.DataFrame]:
     scaled = StandardScaler().fit_transform(x)
-    distance = np.sqrt(((scaled[:, None, :] - scaled[None, :, :]) ** 2).sum(axis=2))
-    medoid_k = best_k(scaled, lambda k: k_medoids(distance, k))
-    medoid_labels = k_medoids(distance, medoid_k)
+    distance = pairwise_distances(scaled)
+    medoid_k, medoid_labels = best_k(scaled, lambda k: k_medoids(distance, k))
 
-    agnes_k = best_k(
+    agnes_k, agnes = best_k(
         scaled,
         lambda k: AgglomerativeClustering(n_clusters=k, linkage="ward").fit_predict(scaled),
     )
-    agnes = AgglomerativeClustering(n_clusters=agnes_k, linkage="ward").fit_predict(scaled)
 
     best_dbscan = (-1.0, np.full(len(x), -1))
     for eps in np.arange(0.8, 3.01, 0.1):
         labels = DBSCAN(eps=float(eps), min_samples=5).fit_predict(scaled)
-        clusters = set(labels) - {-1}
+        mask = labels != -1
+        clusters = set(labels[mask])
         if not 2 <= len(clusters) <= 10:
             continue
-        silhouette = silhouette_score(scaled, labels)
+        silhouette = silhouette_score(scaled[mask], labels[mask])
         if silhouette > best_dbscan[0]:
             best_dbscan = (silhouette, labels)
 
@@ -267,8 +274,7 @@ def main() -> None:
     scored.to_csv(ARTIFACTS / "metrics" / "advanced_scores.csv", index=False)
 
     print("Clustering...")
-    cluster_x = x.copy()
-    labels, profiles = run_clusters(cluster_x, features["loan_id"], y)
+    labels, profiles = run_clusters(x, features["loan_id"], y)
     labels.to_csv(ARTIFACTS / "segments" / "cluster_labels.csv", index=False)
     profiles.to_csv(ARTIFACTS / "segments" / "cluster_profiles.csv", index=False)
 
