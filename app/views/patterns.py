@@ -1,6 +1,30 @@
 """Patterns and segments page."""
 
-from components.common import *
+import altair as alt
+import pandas as pd
+import streamlit as st
+
+from components.common import (
+    ACCENT,
+    GOOD,
+    INK,
+    METHOD_NAMES,
+    MUTED,
+    RISK,
+    cluster_map_figures,
+    cluster_rate_figure,
+    grid,
+    load_features,
+    load_output,
+    note,
+    page_header,
+    parse_itemset,
+    percent,
+    ref_rule,
+    score_config,
+    section,
+    show,
+)
 
 
 def patterns_page() -> None:
@@ -10,13 +34,11 @@ def patterns_page() -> None:
     if itemsets is None or rules is None:
         st.error("Pattern outputs are missing. Run tools/pattern_mining.py.")
         return
-
-    # Both files stack an Apriori and an FP-Growth run. The itemsets file also
-    # ends with a six-row legend whose support cells are text, not numbers.
-    itemsets = itemsets[itemsets["method"].notna()].copy()
-    itemsets["support"] = pd.to_numeric(itemsets["support"], errors="coerce")
     itemsets = itemsets.drop_duplicates(subset=["itemsets"])
     rules = rules.drop_duplicates(subset=["antecedents", "consequents"])
+    if rules.empty:
+        st.warning("No association rules pass the configured thresholds.")
+        return
 
     loans = len(features)
     page_header(
@@ -57,9 +79,9 @@ def patterns_page() -> None:
     )
     cases = round(top["support"] * loans)
     note(
-        f"All {cases} loans with a negative minimum balance defaulted. "
-        f"Confidence 1.00 is a strong signal, but {cases} cases is a small base: the interval "
-        "around it is wide. Use it as a screening flag, not an approval rule.",
+        f"The rule covers {cases} loans at confidence {top['confidence']:.2f} and lift "
+        f"{top['lift']:.2f}. {cases} cases is a small base: the interval around it is wide. "
+        "Use it as a screening flag, not an approval rule.",
         label="Reading it",
     )
 
@@ -83,21 +105,24 @@ def patterns_page() -> None:
         view = cba.copy()
         view["Coverage %"] = (view["coverage"] * 100).round(1)
         view["Confidence %"] = (view["confidence"] * 100).round(1)
-        view["Coverage"] = (view["coverage"] * 100).round(1)
-        view["Defaults"] = (view["coverage"] * loans).round().astype(int)
-        view["Label"] = view["Defaults"].astype(str) + " defaults"
+        view["Covered"] = (view["coverage"] * loans).round().astype(int)
+        view["Label"] = view["Covered"].astype(str) + " covered"
         view["Rule"] = view["antecedents"].map(parse_itemset).str.replace("_", " ")
         bars = (
             alt.Chart(view)
             .mark_bar()
             .encode(
                 y=alt.Y("Rule:N", sort="-x", title=None, axis=alt.Axis(labelLimit=300, labelOverlap=False)),
-                x=alt.X("Coverage:Q", title="Coverage (%)", scale=alt.Scale(domain=[0, float(view["Coverage"].max()) * 1.4])),
+                x=alt.X(
+                    "Coverage %:Q",
+                    title="Coverage (%)",
+                    scale=alt.Scale(domain=[0, float(view["Coverage %"].max()) * 1.4]),
+                ),
                 color=alt.value(ACCENT),
                 tooltip=[
                     "Rule",
-                    alt.Tooltip("Coverage:Q", format=".1f"),
-                    "Defaults",
+                    alt.Tooltip("Coverage %:Q", format=".1f"),
+                    "Covered",
                     alt.Tooltip("support:Q", format=".3f"),
                     alt.Tooltip("confidence:Q", format=".3f"),
                     alt.Tooltip("lift:Q", format=".2f"),
@@ -106,7 +131,7 @@ def patterns_page() -> None:
         )
         labels = alt.Chart(view).mark_text(align="left", dx=6, color=INK, fontSize=9, clip=True).encode(
             y=alt.Y("Rule:N", sort="-x", title=None),
-            x="Coverage:Q",
+            x="Coverage %:Q",
             text="Label:N",
         )
         show((bars + labels).properties(height=max(260, len(view) * 36)).interactive())
@@ -122,8 +147,9 @@ def patterns_page() -> None:
         )
         st.caption(
             "Mined on the full modelling table with fixed, interpretable bins. "
-            "Every rule fires on a negative minimum balance and has confidence 1.0 and lift 8.97, "
-            "so coverage is the only differentiator. The label counts the defaulted loans each rule covers."
+            f"Confidence runs {view['confidence'].min():.2f} to {view['confidence'].max():.2f}; "
+            f"lift runs {view['lift'].min():.2f} to {view['lift'].max():.2f}. "
+            "The label counts the loans each rule covers."
         )
 
     section("Itemsets", f"Apriori and FP-Growth return the same {len(itemsets)} sets")
@@ -165,15 +191,7 @@ def patterns_page() -> None:
         view["Share %"] = (view["size"] / loans * 100).round(1)
         view["Default %"] = (view["default_rate"] * 100).round(1)
         base_rate = float(features["target"].mean()) * 100
-        x_min = float(view["avg_balance"].min())
-        x_max = float(view["avg_balance"].max())
-        base_rule = (
-            alt.Chart(
-                pd.DataFrame({"x": [x_min, x_max], "y": [base_rate, base_rate]})
-            )
-            .mark_line(color=MUTED, strokeDash=[3, 3], clip=True)
-            .encode(x=alt.X("x:Q"), y=alt.Y("y:Q"))
-        )
+        base_rule = ref_rule(base_rate, axis="y", color=MUTED, dash=(3, 3))
         show(
             (
                 base_rule
