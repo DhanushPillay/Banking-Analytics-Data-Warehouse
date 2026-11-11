@@ -1,6 +1,31 @@
 """Models page."""
 
-from components.common import *
+import altair as alt
+import numpy as np
+import pandas as pd
+import streamlit as st
+
+from components.common import (
+    ACCENT,
+    GOOD,
+    INK,
+    MUTED,
+    RISK,
+    RULE,
+    confusion_figure,
+    grid,
+    heatmap_figure,
+    load_features,
+    load_output,
+    load_scores,
+    note,
+    page_header,
+    ref_rule,
+    roc_pr_frames,
+    score_config,
+    section,
+    show,
+)
 
 MODELS = ["Gradient Boosting", "MLP", "CBA rules"]
 COLOURS = [ACCENT, GOOD, RISK]
@@ -32,16 +57,17 @@ def curve(frame: pd.DataFrame, x: str, y: str, extra):
 
 
 def models_page() -> None:
+    features = load_features()
     cv = load_output("cv_comparison.csv")
     metrics = load_output("metrics_comparison.csv")
     tuning = load_output("tuning_results.csv")
-    if cv is None or metrics is None:
+    if cv is None or metrics is None or cv.empty or metrics.empty:
         st.error("Model comparison outputs are missing.")
         return
 
     page_header(
         "Models",
-        "Six classifiers, 50 repeated-CV estimates each",
+        f"{cv['model'].nunique()} classifiers, repeated-CV estimates each",
         "Selection rule: highest repeated-CV F1 on the unresampled baseline arm. The other "
         "columns are checks on that rule, not tie-breakers.",
     )
@@ -104,7 +130,7 @@ def models_page() -> None:
         score_config("F1", "F1 sd", "Avg precision", "ROC-AUC"),
     )
 
-    section("Held-out scores", "Default hyperparameters on the 171-row test split")
+    section("Held-out scores", "Default hyperparameters on the held-out split")
     held = metrics.copy()
     held["Run"] = held["model"] + " / " + held["setting"]
     columns = ["accuracy", "precision", "recall", "f1", "average_precision", "roc_auc"]
@@ -155,7 +181,8 @@ def models_page() -> None:
                 color=alt.Color(
                     "model:N",
                     scale=alt.Scale(
-                        domain=advanced_models, range=COLOURS[: len(advanced_models)]
+                        domain=advanced_models,
+                        range=[COLOURS[index % len(COLOURS)] for index in range(len(advanced_models))],
                     ),
                     title=None,
                 ),
@@ -201,7 +228,10 @@ def models_page() -> None:
             ),
             score_config("F1", "F1 sd", "Avg precision", "ROC-AUC"),
         )
-        st.caption("24 configurations, 50 estimates each. Selection uses this table, not the held-out split.")
+        st.caption(
+            f"{len(cv)} configurations, repeated-CV estimates each. "
+            "Selection uses this table, not the held-out split."
+        )
 
     with tabs[1]:
         roc, pr = roc_pr_frames()
@@ -213,10 +243,8 @@ def models_page() -> None:
             st.markdown("**ROC curves**")
             show(curve(roc, "False positive rate", "True positive rate", diagonal))
 
-        base_rate = load_features()["target"].mean()
-        baseline = alt.Chart(pd.DataFrame({"y": [base_rate]})).mark_rule(
-            color=RULE, strokeDash=[4, 3]
-        ).encode(y="y:Q")
+        base_rate = features["target"].mean()
+        baseline = ref_rule(base_rate, axis="y", color=RULE)
         with right:
             st.markdown("**Precision-recall curves**")
             show(curve(pr, "Recall", "Precision", baseline))
@@ -291,8 +319,13 @@ def models_page() -> None:
                 }
             )
             pivot = challenger.pivot(index="Metric", columns="model", values="Score").reset_index()
-            pivot["Current"] = pivot["Current tuned Gradient Boosting"]
-            pivot["Challenger"] = pivot["Capacity-aware Gradient Boosting"]
+            current = next((name for name in pivot.columns if "Current" in name), None)
+            challenger_name = next((name for name in pivot.columns if "Capacity" in name), None)
+            if current is None or challenger_name is None:
+                st.warning("Challenger model names are not in the comparison.")
+                return
+            pivot["Current"] = pivot[current]
+            pivot["Challenger"] = pivot[challenger_name]
             metric_order = ["F1 at 0.50", "F1 tuned", "Avg precision", "ROC-AUC"]
             points = pivot.melt(
                 id_vars="Metric",
@@ -361,31 +394,43 @@ def models_page() -> None:
                     **score_config("Threshold", places=2),
                 },
             )
-            note(
-                "The challenger adds four capacity ratios and a tuned threshold. It gains 0.004 "
-                "ROC-AUC and loses 0.008 F1 against the selected model, so it stays a challenger.",
-                label="Result",
-            )
+            current_row = comparison[
+                comparison["model"].str.contains("Current", case=False, na=False)
+            ]
+            challenger_row = comparison[
+                comparison["model"].str.contains("Capacity", case=False, na=False)
+            ]
+            if not current_row.empty and not challenger_row.empty:
+                current_row = current_row.iloc[0]
+                challenger_row = challenger_row.iloc[0]
+                note(
+                    "The challenger adds four capacity ratios and a tuned threshold. "
+                    f"It gains {challenger_row['roc_auc_mean'] - current_row['roc_auc_mean']:+.3f} "
+                    f"ROC-AUC and {challenger_row['f1_tuned_mean'] - current_row['f1_tuned_mean']:+.3f} "
+                    "F1 against the selected model, so it stays a challenger.",
+                    label="Result",
+                )
 
     baseline_tuned = cv[(cv["setting"] == "baseline") & (cv["variant"] == "tuned")].sort_values(
         "cv_f1_mean", ascending=False
     )
-    best = baseline_tuned.iloc[0]
-    rival = baseline_tuned[baseline_tuned["model"] == "RandomForest"]
-    if not rival.empty:
-        rival = rival.iloc[0]
-        note(
-            f"The tuned baseline arm leads on F1 at {best['cv_f1_mean']:.3f} ± {best['cv_f1_std']:.3f}. "
-            f"Random Forest trails by {best['cv_f1_mean'] - rival['cv_f1_mean']:.3f} on F1 but leads on "
-            f"average precision ({rival['cv_ap_mean']:.3f} vs {best['cv_ap_mean']:.3f}) and ROC-AUC "
-            f"({rival['cv_auc_mean']:.3f} vs {best['cv_auc_mean']:.3f}). The F1 gap is a fraction of the "
-            "fold-to-fold spread, so the choice is a convention rather than a decisive win.",
-            label="Why this model",
-        )
+    if not baseline_tuned.empty:
+        best = baseline_tuned.iloc[0]
+        rival = baseline_tuned[baseline_tuned["model"] == "RandomForest"]
+        if not rival.empty:
+            rival = rival.iloc[0]
+            note(
+                f"The tuned baseline arm leads on F1 at {best['cv_f1_mean']:.3f} ± {best['cv_f1_std']:.3f}. "
+                f"Random Forest trails by {best['cv_f1_mean'] - rival['cv_f1_mean']:.3f} on F1 but leads on "
+                f"average precision ({rival['cv_ap_mean']:.3f} vs {best['cv_ap_mean']:.3f}) and ROC-AUC "
+                f"({rival['cv_auc_mean']:.3f} vs {best['cv_auc_mean']:.3f}). The F1 gap is a fraction of the "
+                "fold-to-fold spread, so the choice is a convention rather than a decisive win.",
+                label="Why this model",
+            )
 
     note(
-        "76 defaults in 682 loans, and 19 of them in the held-out split. Every interval on this "
-        "page is wide. Treat the ranking as a shortlist, not a verdict.",
+        f"{int(features['target'].sum())} defaults in {len(features):,} loans. Every interval on "
+        "this page is wide. Treat the ranking as a shortlist, not a verdict.",
         label="Limits",
         kind="risk",
     )
