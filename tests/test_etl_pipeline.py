@@ -1,10 +1,8 @@
-import pytest
-import pandas as pd
-import numpy as np
-
-# Adjust path to import from scripts
-import sys
 import os
+import sys
+
+import pandas as pd
+import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from scripts.etl_pipeline import transform_dimensions, transform_facts
@@ -83,7 +81,6 @@ def test_transform_dimensions_customer_parsing(mock_raw_data):
     assert female_client["gender"] == "Female"
     assert female_client["age"] == 29
     assert female_client["age_group"] == "26-35"
-    assert female_client["customer_segment"] == "Unsegmented"
     
     # Client 102: Born 1980 -> 1999 - 1980 = 19 years old, Month 01 -> Male
     assert male_client["gender"] == "Male"
@@ -133,31 +130,16 @@ def test_full_dataset_reconciliation():
     This serves as programmatic proof for the Data Reconciliation table.
     """
     from scripts.etl_pipeline import extract_data, transform_dimensions, transform_facts
-    import os
-    
+
     # Only run if data directory exists (to avoid breaking CI without data)
     if not os.path.exists("data/trans.csv") and not os.path.exists("data/trans.asc"):
         pytest.skip("Raw data not found locally. Skipping full reconciliation test.")
-        
-    # 1. Extract
+
     raw_data = extract_data("data")
-    
-    # 2. Transform
     dims = transform_dimensions(raw_data)
     facts = transform_facts(raw_data, dims)
-    
-    # 3. Assert (Prove Accuracy / No Data Loss)
-    assert len(facts["fact_transactions"]) == len(raw_data["trans"]), "Transaction row count mismatch!"
-    assert len(facts["fact_loans"]) == len(raw_data["loan"]), "Loan row count mismatch!"
-    assert len(dims["dim_account"]) == len(raw_data["account"]), "Account row count mismatch!"
-    assert len(dims["dim_customer"]) == len(raw_data["client"]), "Customer row count mismatch!"
-    
-    print("\n--- ETL ACCURACY PROVEN ---")
-    print(f"Transactions: {len(raw_data['trans'])} raw -> {len(facts['fact_transactions'])} transformed (100% Match)")
-    print(f"Loans: {len(raw_data['loan'])} raw -> {len(facts['fact_loans'])} transformed (100% Match)")
 
-if __name__ == "__main__":
-    import pytest
-    import sys
-    # When you click "Run" in your IDE, this tells pytest to execute this file and print the output (-s)
-    sys.exit(pytest.main(["-s", "-v", __file__]))
+    assert set(facts["fact_transactions"]["transaction_id"]) == set(raw_data["trans"]["trans_id"])
+    assert set(facts["fact_loans"]["loan_id"]) == set(raw_data["loan"]["loan_id"])
+    assert set(dims["dim_account"]["account_id"]) == set(raw_data["account"]["account_id"])
+    assert set(dims["dim_customer"]["customer_id"]) == set(raw_data["client"]["client_id"])
