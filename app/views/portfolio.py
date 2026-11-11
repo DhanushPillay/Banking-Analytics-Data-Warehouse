@@ -1,13 +1,43 @@
 """Executive overview page."""
 
-from components.common import *
+import altair as alt
+import numpy as np
+import pandas as pd
+import streamlit as st
+
+from components.common import (
+    ACCENT,
+    RISK,
+    cutoff_stats,
+    gains_figure,
+    grid,
+    kpi_row,
+    load_features,
+    load_output,
+    load_scores,
+    money,
+    note,
+    page_header,
+    percent,
+    quintile_figure,
+    ref_rule,
+    score_config,
+    score_distribution,
+    scored_frame,
+    section,
+    show,
+)
 
 
 def portfolio_page() -> None:
     features = load_features()
     scores = load_scores()
+    if scores.empty:
+        st.warning("Out-of-fold scores are not available.")
+        return
     defaults = int(features["target"].sum())
     base_rate = float(features["target"].mean())
+    scored = scored_frame(scores, features)
 
     page_header(
         "Portfolio",
@@ -34,10 +64,10 @@ def portfolio_page() -> None:
         value=0.40,
         step=0.01,
     )
-    stats = cutoff_stats(scores, features, cutoff)
+    stats = cutoff_stats(scored, cutoff)
     kpi_row(
         [
-            ("In the queue", f"{stats['flagged']}", f"{stats['flagged'] / stats['total']:.1%} of the portfolio"),
+            ("In the queue", f"{stats['flagged']}", f"{stats['flagged'] / max(stats['total'], 1):.1%} of the portfolio"),
             ("Defaults caught", f"{stats['tp']} / {stats['defaults']}", f"{stats['fn']} missed"),
             ("Precision", percent(stats["precision"]), f"{stats['fp']} false alarms"),
             ("Recall", percent(stats["recall"]), "Share of defaults found"),
@@ -75,7 +105,7 @@ def portfolio_page() -> None:
 
     trade_rows = []
     for value in np.arange(0.05, 0.91, 0.01):
-        entry = cutoff_stats(scores, features, float(value))
+        entry = cutoff_stats(scored, float(value))
         for metric_name in ("precision", "recall"):
             trade_rows.append(
                 {
@@ -107,18 +137,13 @@ def portfolio_page() -> None:
             ],
         )
     )
-    rule = (
-        alt.Chart(pd.DataFrame({"Cutoff": [cutoff]}))
-        .mark_rule(color=INK, strokeDash=[4, 3])
-        .encode(x="Cutoff:Q")
-    )
-    show((lines + rule).properties(height=260).interactive())
+    show((lines + ref_rule(cutoff)).properties(height=260).interactive())
     st.caption(
         "Every cutoff from 5% to 90%. The dashed line is the current setting. "
         "Higher cutoffs buy precision with recall."
     )
 
-    section("Where the risk sits", "Default rate by quintile, all 682 loans")
+    section("Where the risk sits", f"Default rate by quintile, all {len(features):,} loans")
     left, right = st.columns(2, gap="large")
     with left:
         show(quintile_figure(features, "balance_at_loan", "Balance at loan"))
@@ -137,7 +162,7 @@ def portfolio_page() -> None:
 
     section("Behaviour segments", "KMeans k=2 on pre-loan behaviour, from artifacts/segments/segment_profiles.csv")
     profiles = load_output("segment_profiles.csv")
-    if profiles is None:
+    if profiles is None or profiles.empty:
         st.warning("Segment profiles are not available.")
         return
     choice = st.selectbox(
@@ -145,7 +170,11 @@ def portfolio_page() -> None:
         options=profiles["segment"].tolist(),
         format_func=lambda value: f"Segment {value}",
     )
-    profile = profiles[profiles["segment"] == choice].iloc[0]
+    profile_rows = profiles[profiles["segment"] == choice]
+    if profile_rows.empty:
+        st.warning("That segment has no profile row.")
+        return
+    profile = profile_rows.iloc[0]
     kpi_row(
         [
             ("Loans", f"{int(profile['size'])}", "Members of this segment"),
@@ -154,18 +183,21 @@ def portfolio_page() -> None:
             ("Mean transactions", f"{profile['n_txn']:.0f}", "Per loan"),
         ]
     )
-    members = features[features["loan_id"].isin(
-        load_output("loan_segments.csv").query("segment == @choice")["loan_id"]
-    )].merge(scores[["loan_id", "prob_default"]], on="loan_id", how="left")
-    points = members.assign(Outcome=members["target"].map({0: "Repaid", 1: "Default"}))
-    cutoff_rule = (
-        alt.Chart(pd.DataFrame({"y": [cutoff]}))
-        .mark_rule(color=INK, strokeDash=[4, 3])
-        .encode(y="y:Q")
+    memberships = load_output("loan_segments.csv")
+    if memberships is None or memberships.empty:
+        st.warning("Loan segment memberships are not available.")
+        return
+    member_ids = memberships.query("segment == @choice")["loan_id"]
+    members = features[features["loan_id"].isin(member_ids)].merge(
+        scores[["loan_id", "prob_default"]], on="loan_id", how="left"
     )
+    if members.empty:
+        st.warning("This segment has no member loans.")
+        return
+    points = members.assign(Outcome=members["target"].map({0: "Repaid", 1: "Default"}))
     show(
         (
-            cutoff_rule
+            ref_rule(cutoff, axis="y")
             + alt.Chart(points)
             .mark_circle(opacity=0.75)
             .encode(
@@ -209,7 +241,8 @@ def portfolio_page() -> None:
             | score_config("Score"),
         )
     note(
-        f"The two segments differ by {abs(profiles['default_rate'].diff().iloc[-1]):.1%} in default rate. "
+        f"The {len(profiles)} segments differ by "
+        f"{abs(profiles['default_rate'].max() - profiles['default_rate'].min()):.1%} in default rate. "
         "That is weak separation on this sample, and segment membership is not a model feature. "
         "Read it as a description of the book, not as a risk rule.",
         label="Caveat",
