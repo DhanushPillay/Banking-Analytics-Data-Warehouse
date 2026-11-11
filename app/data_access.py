@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
-DB = ROOT / "data" / "banking_dw.duckdb"
+DB = ROOT / os.getenv("LOCAL_DB_PATH", "data/banking_dw.duckdb")
 SOURCE = os.getenv("DATA_SOURCE", "duckdb").strip().lower()
 
 SNOWFLAKE_TABLES = {
@@ -26,7 +26,8 @@ SNOWFLAKE_TABLES = {
 def data_source_label() -> str:
     if SOURCE != "snowflake":
         return "DuckDB"
-    return "Snowflake" if os.getenv("SNOWFLAKE_PAT") else "Snowflake (PAT missing)"
+    has_credentials = os.getenv("SNOWFLAKE_PAT") or os.getenv("SNOWFLAKE_PASSWORD")
+    return "Snowflake" if has_credentials else "Snowflake (credentials missing)"
 
 
 def snowflake_enabled() -> bool:
@@ -46,22 +47,42 @@ def query(sql: str, params: list | None = None) -> pd.DataFrame:
 @st.cache_resource(show_spinner=False)
 def snowflake_connection():
     import snowflake.connector
+    from snowflake.connector.errors import DatabaseError
 
+    options = {
+        "account": os.environ["SNOWFLAKE_ACCOUNT"],
+        "user": os.environ["SNOWFLAKE_USER"],
+        "role": os.environ["SNOWFLAKE_ROLE"],
+        "warehouse": os.environ.get("SNOWFLAKE_WAREHOUSE", "PBI_WH"),
+        "database": os.environ.get("SNOWFLAKE_DATABASE", "LOAN_DEFAULT_DW"),
+        "schema": os.environ.get("SNOWFLAKE_SCHEMA", "RAW"),
+    }
     token = os.getenv("SNOWFLAKE_PAT")
-    if not token:
-        raise RuntimeError(
-            "SNOWFLAKE_PAT is not set. Add it to .env or set DATA_SOURCE=duckdb."
+    if token:
+        return snowflake.connector.connect(
+            **options,
+            authenticator="PROGRAMMATIC_ACCESS_TOKEN",
+            token=token,
         )
-    return snowflake.connector.connect(
-        account=os.environ["SNOWFLAKE_ACCOUNT"],
-        user=os.environ["SNOWFLAKE_USER"],
-        authenticator="PROGRAMMATIC_ACCESS_TOKEN",
-        token=token,
-        role=os.environ["SNOWFLAKE_ROLE"],
-        warehouse=os.environ.get("SNOWFLAKE_WAREHOUSE", "PBI_WH"),
-        database=os.environ.get("SNOWFLAKE_DATABASE", "LOAN_DEFAULT_DW"),
-        schema=os.environ.get("SNOWFLAKE_SCHEMA", "RAW"),
-    )
+    password = os.getenv("SNOWFLAKE_PASSWORD")
+    if not password:
+        raise RuntimeError(
+            "Set SNOWFLAKE_PAT or SNOWFLAKE_PASSWORD in .env, or DATA_SOURCE=duckdb."
+        )
+    options["password"] = password
+    try:
+        return snowflake.connector.connect(**options)
+    except DatabaseError as exc:
+        if "MFA" not in str(exc).upper():
+            raise
+        code = os.getenv("SNOWFLAKE_MFA_CODE")
+        if not code:
+            raise RuntimeError("SNOWFLAKE_MFA_CODE is required for MFA login.") from exc
+        return snowflake.connector.connect(
+            **options,
+            authenticator="username_password_mfa",
+            passcode=code,
+        )
 
 
 def snowflake_query(sql: str, params: list | None = None) -> pd.DataFrame:
@@ -90,16 +111,20 @@ def read_table(table: str, fallback: Path | None = None) -> pd.DataFrame:
 
 
 def table_counts() -> pd.DataFrame:
-    tables = ["dim_date", "dim_branch", "dim_customer", "dim_account", "dim_loan_type", "fact_loans", "fact_transactions"]
-    rows = []
-    for table in tables:
-        count = query(f"SELECT count(*) AS rows FROM mart.{table}").iloc[0]["rows"]
-        rows.append({"table": table, "rows": int(count)})
-    return pd.DataFrame(rows)
-
-
-def transactions_for_audit() -> pd.DataFrame:
-    return query("SELECT account_id, date_id FROM mart.fact_transactions")
+    tables = [
+        "dim_date",
+        "dim_branch",
+        "dim_customer",
+        "dim_account",
+        "dim_loan_type",
+        "fact_loans",
+        "fact_transactions",
+    ]
+    union = " UNION ALL ".join(
+        f"SELECT '{table}' AS table, count(*) AS rows FROM mart.{table}"
+        for table in tables
+    )
+    return query(union)
 
 
 def snowflake_leakage() -> pd.DataFrame:
