@@ -4,8 +4,10 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
+from etl_pipeline import LOCAL_DB, write_tables
+
 ROOT = Path(__file__).resolve().parent.parent
-DB = ROOT / "data" / "banking_dw.duckdb"
+DB = LOCAL_DB
 ARTIFACTS = ROOT / "artifacts"
 
 TABLES = {
@@ -29,19 +31,13 @@ TABLES = {
 
 
 def main() -> None:
+    missing = [f"{table} ({path})" for table, path in TABLES.items() if not path.exists()]
+    if missing:
+        raise SystemExit("Missing analytics outputs:\n  " + "\n  ".join(missing))
     con = duckdb.connect(str(DB))
     con.execute("CREATE SCHEMA IF NOT EXISTS analytics")
-    for table, path in TABLES.items():
-        if not path.exists():
-            print(f"skip {table}: {path} missing")
-            continue
-        frame = pd.read_csv(path)
-        con.register(f"frame_{table}", frame)
-        con.execute(
-            f"CREATE OR REPLACE TABLE analytics.{table} AS "
-            f"SELECT * FROM frame_{table}"
-        ).fetchall()
-        con.unregister(f"frame_{table}")
+    write_tables(con, "analytics", {table: pd.read_csv(path) for table, path in TABLES.items()})
+    for table in TABLES:
         rows = con.execute(f"SELECT count(*) FROM analytics.{table}").fetchall()[0][0]
         print(f"{table}: {rows} rows")
     con.execute("CHECKPOINT")
