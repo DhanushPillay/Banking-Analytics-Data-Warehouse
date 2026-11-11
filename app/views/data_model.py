@@ -1,8 +1,22 @@
 """Data model card page."""
 
-from components.common import *
-from data_access import query
+import pandas as pd
+import streamlit as st
 
+from components.common import (
+    FOREIGN_KEYS,
+    SCHEMA,
+    grid,
+    kpi_row,
+    load_features,
+    mart_counts,
+    note,
+    page_header,
+    row_count_chart,
+    section,
+    show,
+)
+from data_access import query
 
 ANALYTICS_LAYER = {
     "loan_features": "Leakage-safe modelling table",
@@ -54,6 +68,7 @@ def galaxy_dot(counts: pd.DataFrame) -> str:
     return f"{DOT_HEAD}{nodes}\n\n{edges}\n}}"
 
 
+@st.cache_data(show_spinner=False, ttl=600)
 def schema_frame() -> pd.DataFrame:
     columns = query(
         "SELECT table_name, column_name, data_type, ordinal_position "
@@ -66,30 +81,40 @@ def schema_frame() -> pd.DataFrame:
         .str.replace("TIMESTAMP_NS", "TIMESTAMP", regex=False)
         .str.replace(r"^ENUM\(.*\)$", "ENUM", regex=True)
     )
-    counts = table_counts()
-    columns = columns.merge(counts.rename(columns={"table": "table_name"}), on="table_name")
-    return columns
+    counts = mart_counts().rename(columns={"table": "table_name"})
+    return columns.merge(counts, on="table_name", how="left")
+
+
+@st.cache_data(show_spinner=False, ttl=600)
+def analytics_counts() -> pd.DataFrame:
+    tables = query(
+        "SELECT table_name FROM information_schema.tables "
+        "WHERE table_schema = 'analytics' ORDER BY table_name"
+    )["table_name"].tolist()
+    if not tables:
+        return pd.DataFrame(columns=["Table", "Purpose", "Rows"])
+    counts = query(
+        " UNION ALL ".join(
+            f"SELECT '{table}' AS table_name, count(*) AS rows FROM analytics.{table}"
+            for table in tables
+        )
+    )
+    return pd.DataFrame(
+        {
+            "Table": "analytics." + counts["table_name"],
+            "Purpose": counts["table_name"].map(ANALYTICS_LAYER).fillna("Saved output"),
+            "Rows": counts["rows"].astype(int),
+        }
+    )
 
 
 def data_model_page() -> None:
     features = load_features()
     columns = schema_frame()
-    counts = table_counts()
+    counts = mart_counts()
+    analytics = analytics_counts()
     dimensions = int(counts["table"].str.startswith("dim_").sum())
     facts = int(counts["table"].str.startswith("fact_").sum())
-
-    analytics = query(
-        "SELECT table_name FROM information_schema.tables "
-        "WHERE table_schema = 'analytics' ORDER BY table_name"
-    )
-    analytics_frame = pd.DataFrame(
-        {
-            "Table": f"analytics.{table}",
-            "Purpose": ANALYTICS_LAYER.get(table, "Saved output"),
-            "Rows": int(query(f"SELECT count(*) AS rows FROM analytics.{table}").iloc[0]["rows"]),
-        }
-        for table in analytics["table_name"]
-    )
 
     page_header(
         "Data model",
@@ -109,7 +134,7 @@ def data_model_page() -> None:
         ]
     )
 
-    section("Galaxy schema", "Two fact tables share five conformed dimensions")
+    section("Galaxy schema", f"{facts} fact tables share {dimensions} conformed dimensions")
     st.graphviz_chart(galaxy_dot(counts), width="stretch")
     st.caption(
         "Blue nodes are fact tables, light nodes are dimensions, and edge labels are join "
@@ -122,9 +147,10 @@ def data_model_page() -> None:
         chosen = st.selectbox("Table", counts["table"].tolist())
         table_columns = columns[columns["table_name"] == chosen].copy()
         foreign = {(src, key) for src, key, _ in FOREIGN_KEYS}
+        primary_key = SCHEMA.get(chosen)
 
         def key_role(row) -> str:
-            if SCHEMA[chosen][0] == row["column_name"]:
+            if primary_key == row["column_name"]:
                 return "Primary key"
             if (chosen, row["column_name"]) in foreign:
                 return "Foreign key"
@@ -139,20 +165,22 @@ def data_model_page() -> None:
 
     section("Analytics layer", "Derived tables loaded into the same database")
     chart_frame = (
-        analytics_frame.assign(
-            Table=analytics_frame["Table"].str.replace("analytics.", "", regex=False)
+        analytics.assign(
+            Table=analytics["Table"].str.replace("analytics.", "", regex=False)
         )
         .sort_values("Rows", ascending=False)
         .head(10)
     )
     show(row_count_chart(chart_frame))
     with st.expander("All analytics tables"):
-        grid(analytics_frame, {"Rows": st.column_config.NumberColumn(format="%d")})
+        grid(analytics, {"Rows": st.column_config.NumberColumn(format="%d")})
 
     note(
-        "Two facts, five dimensions, and ten foreign-key joins. `dim_loan_type` holds one "
-        "explicit unknown member because PKDD'99 has no loan product or interest rate; the "
-        "fact keeps `interest_rate` null instead of inventing a rate. The date dimension is "
-        "conformed, so loan and transaction dates roll up through the same calendar.",
+        f"{facts} facts, {dimensions} dimensions, and {len(FOREIGN_KEYS)} foreign-key joins. "
+        "`dim_loan_type` holds one explicit unknown member because PKDD'99 has no loan product "
+        "or interest rate; the fact keeps `interest_rate` null instead of inventing a rate. "
+        "The date dimension is conformed, so loan and transaction dates roll up through the "
+        "same calendar.",
         label="Design notes",
     )
+    st.caption("This card reads the local DuckDB catalog; Snowflake mode serves the four analytics tables.")
