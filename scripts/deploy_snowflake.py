@@ -22,10 +22,6 @@ load_dotenv(ROOT / ".env")
 
 
 def connect() -> snowflake.connector.SnowflakeConnection:
-    code = getpass.getpass("Snowflake TOTP code (6 digits): ").strip()
-    if not code.isdigit() or len(code) != 6:
-        raise SystemExit("Enter a 6-digit TOTP code")
-
     opts = {
         "account": os.environ["SNOWFLAKE_ACCOUNT"],
         "user": os.environ["SNOWFLAKE_USER"],
@@ -34,6 +30,21 @@ def connect() -> snowflake.connector.SnowflakeConnection:
         "database": os.environ.get("SNOWFLAKE_DATABASE", "LOAN_DEFAULT_DW"),
         "schema": os.environ.get("SNOWFLAKE_SCHEMA", "RAW"),
     }
+    pat = os.environ.get("SNOWFLAKE_PAT")
+    if pat:
+        print("Connecting with PAT...", flush=True)
+        conn = snowflake.connector.connect(
+            **opts,
+            authenticator="PROGRAMMATIC_ACCESS_TOKEN",
+            token=pat,
+        )
+        print("Connected.", flush=True)
+        return conn
+
+    code = getpass.getpass("Snowflake TOTP code (6 digits): ").strip()
+    if not code.isdigit() or len(code) != 6:
+        raise SystemExit("Enter a 6-digit TOTP code")
+
     print("Connecting...", flush=True)
     conn = snowflake.connector.connect(
         **opts,

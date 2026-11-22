@@ -43,11 +43,12 @@ dimension.
 now reads live from it.
 
 - A warehouse (`PBI_WH`), database (`LOAN_DEFAULT_DW`), and two schemas: `RAW`
-  (the five source extracts) and `MART` (the modelled tables and views).
-- All 11 objects loaded and checked: 5 RAW tables, 6 MART tables, plus the views
-  `V_LOAN_PERF` and `V_TRANS_MONTHLY`.
-- Row counts matched exactly: e.g. 682 loans, 1,056,320 transactions, and 682 rows
-  in each modelled table.
+  (the five source extracts) and `MART` (the dimensions, facts, analytics tables,
+  and views).
+- All 18 tables loaded and checked: 5 RAW tables, 13 MART tables (5 dimensions,
+  2 facts, 6 analytics), plus the views `V_LOAN_PERF` and `V_TRANS_MONTHLY`.
+- Row counts matched exactly: e.g. 682 loans, 1,056,320 transactions, 5,369
+  customers, and 682 rows in each per-loan analytics table.
 
 **How we did it.** `sql/snowflake/ddl_snowflake.sql` creates the objects,
 `scripts/upload_to_snowflake.py` loads the CSVs (it clears each table first, so

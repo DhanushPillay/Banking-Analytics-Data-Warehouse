@@ -1,0 +1,240 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{eso-pic}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usetikzlibrary{calc, shapes.geometric, shapes.multipart, arrows.meta, positioning, fit, backgrounds, decorations.pathreplacing}
+
+% --- PAGE BORDER ---
+\definecolor{bordercolor}{HTML}{B3A382} % Khaki/Gold border color matching the Word template
+\AddToShipoutPictureBG{%
+\begin{tikzpicture}[overlay,remember picture]
+\draw[line width=0.5pt, double, double distance=1.5pt, color=bordercolor]
+    ($ (current page.north west) + (0.5in,-0.5in) $)
+    rectangle
+    ($ (current page.south east) + (-0.5in,0.5in) $);
+\end{tikzpicture}
+}
+
+% --- HEADER & FOOTER ---
+\pagestyle{fancy}
+\fancyhf{} % Clear defaults
+\renewcommand{\headrulewidth}{0pt} % Remove header line
+% Set footer for standard pages
+\cfoot{\textcolor{blue!60}{\fontsize{9pt}{11pt}\selectfont MIT School of Computing, MIT ADT University}}
+\rfoot{\thepage}
+
+% Ensure title pages, certificates, and chapter starting pages also have the footer
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \cfoot{\textcolor{blue!60}{\fontsize{9pt}{11pt}\selectfont MIT School of Computing, MIT ADT University}}
+}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \cfoot{\textcolor{blue!60}{\fontsize{9pt}{11pt}\selectfont MIT School of Computing, MIT ADT University}}
+  \rfoot{\thepage}
+}
+
+% Chapter formatting
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{16pt}{19pt}\bfseries\centering}{\chaptertitlename\ \thechapter}{10pt}{\fontsize{16pt}{19pt}\selectfont}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+\titleformat{\section}
+  {\normalfont\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+
+% Code block styling
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{mitpurple}{HTML}{7030A0} % Deep purple matching Word
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% Colors for TikZ
+\definecolor{primary}{RGB}{225,29,72}
+\definecolor{secondary}{RGB}{13,148,136}
+\definecolor{accent}{RGB}{245,158,11}
+\definecolor{dark}{RGB}{15,23,42}
+\definecolor{lightgray}{RGB}{241,245,249}
+\definecolor{midgray}{RGB}{148,163,184}
+\definecolor{success}{RGB}{16,185,129}
+\definecolor{danger}{RGB}{239,68,68}
+\definecolor{tablebg}{HTML}{f8fafc}
+\definecolor{tableborder}{HTML}{cbd5e1}
+
+\begin{document}
+\pagenumbering{roman}
+
+% --- TITLE PAGE ---
+\begin{titlepage}
+    \centering
+    \vspace*{0.5cm}
+    
+    {\Large \textbf{A JURY PROJECT REPORT}}\\[0.3cm]
+    \textit{Submitted in partial fulfillment of the requirements} \\
+    \textit{for the award of the degree of}\\[0.3cm]
+    
+    {\Large \textbf{BACHELOR OF TECHNOLOGY}} \\
+    \textit{in} \\
+    {\large \textbf{COMPUTER SCIENCE \& ENGINEERING}}\\[0.3cm]
+    
+    \textcolor{mitpurple}{\textbf{SUBJECT: DATA WAREHOUSING AND DATA MINING (DWDM)}}\\[0.8cm]
+    
+    {\LARGE \textbf{``Customer Behavioral Analysis and Loan Default Classification''}}\\[0.4cm]
+    {\large \textit{A Banking Analytics Data Warehouse on Snowflake with a Streamlit Review Dashboard}}\\[0.8cm]
+    
+    \includegraphics[width=0.2\textwidth]{logo.png} \\[0.3cm]
+    
+    \textbf{SUBMITTED BY:}\\
+    Dhanush Pillay \hspace{1cm} ADT24SOCB0765 \\
+    Shubhangini Dixit \hspace{0.65cm} ADT24SOCB1156 \\
+    Semester: $5^{th}$ Semester / TY BDCE \\[0.5cm]
+    
+    \textbf{INTERNAL FACULTY GUIDE:}\\
+    Dr. Reena Pagare \\
+    Department of Computer Science \& Engineering \\[0.5cm]
+    
+    \vfill
+    
+    \textbf{DEPARTMENT OF COMPUTER SCIENCE \& ENGINEERING}\\
+    \textcolor{mitpurple}{\textbf{MIT ART, DESIGN AND TECHNOLOGY UNIVERSITY, PUNE}}\\
+    Loni Kalbhor, Pune, MH, India -- 412201
+\end{titlepage}
+
+\newpage
+\begin{spacing}{1.35}
+\tableofcontents
+\end{spacing}
+\listoffigures
+\listoftables
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+\begin{center}
+    {\huge \textbf{Abstract}}\\[1cm]
+\end{center}
+
+The project predicts whether a loan will default using only information that was available before the loan was granted. The data comes from the PKDD'99 Czech banking dataset: 682 loans, 76 defaults (an 11.14\% base rate), and 1,056,320 transactions recorded between 1993 and 1998. The central rule of the project is a strict leakage boundary: no transaction, balance, or account event dated on or after the loan date is used to build a predictive feature.
+
+The work covers the full path from raw CSV extracts to a Snowflake data warehouse, a leakage-safe feature mart, six classifiers compared under repeated cross-validation, association-rule mining, behavioural segmentation, and an eight-page Streamlit review dashboard. The warehouse follows a Kimball galaxy schema with two fact tables sharing five conformed dimensions, deployed in Snowflake as a RAW staging layer and a MART layer of modelled tables and reporting views.
+
+The selected classifier is a tuned Gradient Boosting model with repeated cross-validation F1 of $0.571 \pm 0.120$, average precision $0.654$, and ROC AUC $0.864$. Random Forest is statistically tied on F1 and leads on average precision and ROC AUC, so the result is best read as a leading pair rather than a single dominant algorithm. The strongest signal is the customer's balance before the loan; age and gender carry almost no predictive value. A simple balance screen below CZK 20,000 flags 97 of 682 applications and catches 34 of the 76 defaults, at 35.1\% precision against the 11.1\% base rate. The intended use of the model is a review queue, not an automatic rejection rule.
+
+\clearpage
+\pagenumbering{arabic}
+
+\include{chapters/chapter_1}
+\include{chapters/chapter_2}
+\include{chapters/chapter_3}
+\include{chapters/chapter_4}
+\include{chapters/chapter_5}
+\include{chapters/chapter_6}
+\include{chapters/chapter_7}
+\include{chapters/chapter_8}
+\include{chapters/chapter_9}
+\include{chapters/chapter_10}
+\include{chapters/chapter_11}
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendix A: Jury Rubric Map}
+\begin{center}
+    {\huge \textbf{Appendix A: Jury Rubric Map}}\\[1cm]
+\end{center}
+
+\begin{table}[H]
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{\textwidth}{|c|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Item} & \textbf{Rubric requirement} & \textbf{Report section / evidence} \\
+        \hline
+        A & Data Warehouse Design & Chapter 5; Fig.~\ref{fig:galaxy_schema}, Fig.~\ref{fig:dashboard_datacard}; Dashboard: Data model card \\
+        \hline
+        B & Snowflake Deployment & Chapter 4; Table~\ref{tab:snowflake_objects}; Dashboard: Snowflake \\
+        \hline
+        C & Supervised Learning Dataset & Chapter 6; Fig.~\ref{fig:feature_vector}; Dashboard: Data and leakage \\
+        \hline
+        D & Pattern Matching (Apriori, FP-Growth) & Chapter 7; Fig.~\ref{fig:pattern_flow}; Dashboard: Patterns \\
+        \hline
+        E & Classifier Comparison and Validation & Chapter 8; Table~\ref{tab:cv_results}; Dashboard: Models \\
+        \hline
+        F & Classification Algorithm Implementation & Chapter 8, Section 8.6; Dashboard: Simulator \\
+        \hline
+        G & Unsupervised Learning Dataset & Chapter 9, Section 9.2; Dashboard: Segments \\
+        \hline
+        H & Clustering Algorithm Comparison & Chapter 9, Section 9.4; Table~\ref{tab:clustering_compare} \\
+        \hline
+        I & Clustering Algorithm Implementation & Chapter 9, Sections 9.5--9.6 \\
+        \hline
+        J & Performance Metrics & Chapter 8, Section 8.5 and Chapter 9, Section 9.8 \\
+        \hline
+    \end{tabularx}
+    \caption{End-semester jury rubric items A--J mapped to report sections and dashboard pages}
+    \label{tab:jury_map}
+\end{table}
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\begin{center}
+    {\huge \textbf{References}}\\[1cm]
+\end{center}
+
+\begin{itemize}[leftmargin=1.5cm, label={}, itemsep=0.8cm]
+    \item[\textbf{R1}] \textbf{Dataset}
+    \begin{enumerate}[label={[\arabic*]}, leftmargin=*, labelsep=0.3cm, itemsep=0.3cm]
+        \item P. Berka, ``PKDD'99 Discovery Challenge: Financial Dataset,'' 1999. [Online]. Available: \url{https://www.kaggle.com/datasets/siavashraz/1999-czech-financial-dataset}
+    \end{enumerate}
+    \item[\textbf{R2}] R. Kimball and M. Ross, \textit{The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling}, 3rd ed. Hoboken, NJ, USA: Wiley, 2013.
+    \item[\textbf{R3}] F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine Learning in Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+    \item[\textbf{R4}] S. Raschka, ``MLxtend: Providing machine learning and data science utilities and extensions to Python's scientific computing stack,'' \textit{Journal of Open Source Software}, vol. 3, no. 24, p. 638, 2018.
+    \item[\textbf{R5}] R. Agrawal and R. Srikant, ``Fast Algorithms for Mining Association Rules in Large Databases,'' in \textit{Proc. 20th Int. Conf. Very Large Data Bases (VLDB)}, 1994, pp. 487--499.
+    \item[\textbf{R6}] J. Han, J. Pei, and Y. Yin, ``Mining Frequent Patterns without Candidate Generation,'' in \textit{Proc. ACM SIGMOD Int. Conf. Management of Data}, 2000, pp. 1--12.
+    \item[\textbf{R7}] L. Breiman, ``Random Forests,'' \textit{Machine Learning}, vol. 45, no. 1, pp. 5--32, 2001.
+    \item[\textbf{R8}] Snowflake Inc., ``Snowflake Documentation -- Databases, Schemas and Views.'' [Online]. Available: \url{https://docs.snowflake.com/}
+    \item[\textbf{R9}] Streamlit Inc., ``Streamlit Documentation -- Data Apps in Python.'' [Online]. Available: \url{https://docs.streamlit.io/}
+\end{itemize}
+
+\end{document}

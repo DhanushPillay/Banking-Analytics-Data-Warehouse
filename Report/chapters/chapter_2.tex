@@ -1,0 +1,32 @@
+\chapter{Literature Review \& Background}
+\section{The PKDD '99 Financial Dataset (Berka Dataset)}
+This project uses the \textbf{PKDD '99 Financial Dataset}, also known as the \textbf{Berka Dataset}. It contains anonymized real world financial data from a Czech bank. The data was first released for the Discovery Challenge at the 1999 European Conference on Principles of Data Mining and Knowledge Discovery.
+
+\subsection*{Background and Purpose}
+The bank originally collected this data to improve customer service and manage risk. They wanted to understand customer behavior better, specifically to identify "good" clients for new financial products and "bad" clients who might default on their loans.
+
+\subsection*{Relational Structure}
+The raw data is highly normalized and spread across several interconnected files:
+\begin{itemize}
+    \item \textbf{Clients (\texttt{client.csv}):} Demographic details of the bank's customers.
+    \item \textbf{Accounts (\texttt{account.csv}):} Static details about the accounts, like when they were created.
+    \item \textbf{Dispositions (\texttt{disp.csv}):} A mapping table that connects clients to accounts and shows their permissions, like OWNER or DISPONENT.
+    \item \textbf{Transactions (\texttt{trans.csv}):} A large table with historical records of all account transactions, including deposits and withdrawals.
+    \item \textbf{Loans (\texttt{loan.csv}):} Details on granted loans, including the amount, duration, and final status.
+    \item \textbf{Demographics (\texttt{district.csv}):} Socioeconomic statistics for the districts where the clients live.
+\end{itemize}
+
+\subsection*{Use in Analytics}
+The PKDD '99 dataset is a common benchmark in data science because it has a complex structure and long transaction histories. Researchers often use it for \textbf{relational data mining} and predictive modeling, such as forecasting loan defaults based on past transactions. In this project, we transform this normalized data into a dimensional model so that loan and transaction histories can be queried against the same dates, accounts, and branches.
+
+\section{Dimensional Modeling}
+Dimensional modeling is a design technique for data warehouses introduced by Ralph Kimball. It structures data into fact tables (measurements) and dimension tables (context), enabling intuitive querying and high performance for BI tools. A \textit{star schema} has one fact table surrounded by dimension tables. When several fact tables share the same conformed dimensions, the design is called a \textit{galaxy schema}. This project uses a galaxy schema so that loan metrics and transaction metrics can be analysed together.
+
+\section{Credit Risk and Default Prediction}
+Credit-risk modelling usually separates a good loan from a default using application data and prior account behaviour. Classical approaches include scored card models, decision trees, and ensemble methods such as random forests and gradient boosting. A recurring finding across this family of work is that recent balance and cash-flow behaviour carry more signal than demographics. This project follows that line: balance-derived features lead the model, while age and gender contribute almost nothing and are retained only as a documented baseline input.
+
+\section{Leakage in Predictive Modelling}
+A predictive model must not see information that was unavailable at scoring time. In a loan setting this means every behavioural feature has to be computed from transactions strictly earlier than the loan date. Leakage can enter subtly, for example by scaling on the full dataset before splitting, or by aggregating all transactions of an account and attaching the same vector to every loan. This project addresses both forms: the feature mart uses a date-bounded join, and all scaling and resampling live inside the fitted scikit-learn pipeline so that each validation fold is transformed from its own training data only.
+
+\section{Association Rules and Clustering}
+Association-rule mining finds implications such as ``negative balance implies default''. Apriori uses a candidate-generation level-wise search, while FP-Growth compresses transactions into a frequent-pattern tree and avoids candidate generation. Both are run here over pre-loan behaviour baskets so that the two algorithms can be compared on the same data. Clustering complements the supervised model by grouping loans without looking at the default label. K-Means, K-Medoids, AGNES, and DBSCAN represent partitional, medoid-based, hierarchical, and density-based approaches respectively, and are compared on the same standardised feature matrix.

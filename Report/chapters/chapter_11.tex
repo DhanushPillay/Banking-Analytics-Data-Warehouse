@@ -1,0 +1,36 @@
+\chapter{Conclusion and Future Scope}
+
+\section{Summary}
+This project built a complete analytics path from the raw PKDD'99 Czech banking extracts to an interactive review dashboard. The source data was reconciled to 682 loans, 1,056,320 transactions, 5,369 clients, 4,500 accounts, and 77 districts covering 1993 to 1998. A galaxy schema was modelled with two fact tables, \texttt{fact\_loans} and \texttt{fact\_transactions}, and five conformed dimensions. The warehouse was deployed to Snowflake with a RAW layer for the extracts and a MART layer for the modelled tables, together with two reporting views, \texttt{V\_LOAN\_PERF} and \texttt{V\_TRANS\_MONTHLY}. The loader truncates each target before writing, so reruns do not duplicate rows.
+
+On top of the warehouse, a 28-column feature mart (27 columns exported for modelling) was built with a strict pre-loan rule: a transaction contributes only if \texttt{t.date\_id $<$ l.loan\_date\_id}. The check reports zero post-loan rows. Eighteen features were used for modelling: 13 behavioural aggregates, three loan terms, and two demographic attributes. Six classifiers were compared across 24 configurations under repeated five-fold cross-validation with ten repeats. The tuned Gradient Boosting model was selected with F1 $0.571 \pm 0.120$, average precision $0.654$, and ROC-AUC $0.864$, with Random Forest statistically tied on F1 and leading on the other two metrics.
+
+Association-rule mining with Apriori and FP-Growth returned the same 41 itemsets at a support threshold of 0.03. The strongest default rule, negative balance, carries a lift of 8.97 and a precision of 1.000, but covers only 27 of the 76 defaults. Unsupervised clustering on the 13 behavioural features compared K-Means, K-Medoids, AGNES, and DBSCAN; K-Means with $k=2$ was recommended for its stability and full coverage, while DBSCAN's 129 noise loans were retained as a separate manual-review flag with a 23.26\% default rate.
+
+All results were delivered through an eight-page Streamlit application using Altair charts and a Graphviz schema view. The application reads saved artifacts and does not retrain on load, so the displayed values match the reported ones.
+
+\section{Contributions}
+\begin{itemize}
+    \item A reconciled dimensional warehouse with documented row counts, keys, and column dictionaries, deployable to Snowflake and reproducible locally.
+    \item A leakage-controlled feature mart with an explicit temporal rule and a verification check that reports zero post-loan rows.
+    \item A rigorous model comparison under repeated cross-validation, including class-imbalance strategies and a clear account of which strategies helped and which did not.
+    \item Two independent pattern views: association rules for interpretable screens and clustering for behavioural segments, both kept separate from the supervised target until interpretation.
+    \item One dashboard satisfying the three jury dashboards while also exposing the model, rule, and segmentation evidence needed by the remaining rubric items.
+\end{itemize}
+
+\section{Limitations}
+The dataset contains only 76 defaults, and the held-out fold set contains about 19. Confidence intervals are therefore wide, and the tuned cross-validation estimate is slightly optimistic because the same data informed the tuning. The data ends in 1998, so the learned behaviour reflects a historical Czech banking market and may not transfer to a current portfolio. The loan type dimension has a single \texttt{Unspecified} member and the interest rate is null for every row, so product-level risk differences cannot be measured. Age and gender were available but deliberately excluded from deployment because using them as risk factors is not acceptable. The classifier-based rule set has perfect precision but low recall, so it is a review filter rather than a screening rule. The intended role of the model is a review queue: the balance screen under CZK 20{,}000 catches 34 of the 76 defaults at 35.1\% precision and flags 97 loans, which means most flagged loans are not defaulters.
+
+\section{Future Scope}
+\begin{itemize}
+    \item \textbf{Refresh the data.} Newer loan vintages with labelled outcomes would narrow the confidence intervals and test whether the behavioural signals persist.
+    \item \textbf{Prospective validation.} Score a forward period before deployment and compare predicted rankings with observed defaults, rather than relying only on historical cross-validation.
+    \item \textbf{Richer product attributes.} Loan purpose, interest rate, and collateral would give the loan-type dimension real members and may improve discrimination.
+    \item \textbf{Fairness audit.} Test error rates and review rates across protected groups before any operational use, and keep demographic attributes out of the deployed feature set.
+    \item \textbf{Real-time ingestion.} The current loader is batch. A streaming layer using a managed queue and incremental warehouse tables could shorten the gap between a transaction and an updated feature.
+    \item \textbf{Cloud scaling.} The same MART design could be moved to a different cloud warehouse, for example BigQuery or Redshift, if organisational standards change; this is a future option, not part of the delivered system.
+    \item \textbf{Threshold policy.} Replace the fixed cutoff with a cost-based rule that weights a missed default against the analyst time spent reviewing a flagged loan.
+\end{itemize}
+
+\section{Concluding Remark}
+The delivered system answers the three questions the jury guide asks. The warehouse stores the data with a documented design and a working Snowflake deployment. The supervised dataset is built without future information and produces a measurable classifier with honest uncertainty. The dashboard exposes all of it in one place. The most useful outcome is not a single accuracy figure but a defensible, inspectable pipeline whose limitations are stated as clearly as its results.

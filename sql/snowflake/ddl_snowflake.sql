@@ -59,6 +59,30 @@ CREATE OR REPLACE TABLE MART_CLUSTERING_COMPARISON (
   coverage FLOAT, min_cluster_share FLOAT, stability_ari_mean FLOAT,
   stability_ari_std FLOAT, role VARCHAR, recommended BOOLEAN);
 
+CREATE OR REPLACE TABLE DIM_DATE (
+  date_id NUMBER, full_date DATE, day NUMBER, month NUMBER, month_name VARCHAR,
+  quarter NUMBER, year NUMBER, day_of_week VARCHAR, is_weekend BOOLEAN);
+CREATE OR REPLACE TABLE DIM_BRANCH (
+  branch_id NUMBER, branch_name VARCHAR, city VARCHAR, region VARCHAR,
+  branch_type VARCHAR);
+CREATE OR REPLACE TABLE DIM_CUSTOMER (
+  customer_id NUMBER, first_name VARCHAR, last_name VARCHAR, gender VARCHAR,
+  gender_bin NUMBER, age NUMBER, age_group VARCHAR, city VARCHAR,
+  home_branch_id NUMBER, customer_segment VARCHAR, account_open_date DATE);
+CREATE OR REPLACE TABLE DIM_ACCOUNT (
+  account_id NUMBER, customer_id NUMBER, account_type VARCHAR, open_date DATE,
+  status VARCHAR);
+CREATE OR REPLACE TABLE DIM_LOAN_TYPE (
+  loan_type_id NUMBER, loan_type_name VARCHAR, typical_rate_pct FLOAT);
+CREATE OR REPLACE TABLE FACT_LOANS (
+  loan_id NUMBER, account_id NUMBER, customer_id NUMBER, branch_id NUMBER,
+  loan_type_id NUMBER, date_id NUMBER, amount NUMBER, interest_rate FLOAT,
+  tenure_months NUMBER, payments FLOAT, status_code VARCHAR, status VARCHAR);
+CREATE OR REPLACE TABLE FACT_TRANSACTIONS (
+  transaction_id NUMBER, source_row NUMBER, account_id NUMBER, date_id NUMBER,
+  branch_id NUMBER, transaction_type VARCHAR, operation VARCHAR,
+  amount FLOAT, balance FLOAT);
+
 CREATE OR REPLACE VIEW LOAN_DEFAULT_DW.MART.V_LOAN_PERF AS
 SELECT r.*, s.prob_default, g.segment,
        CASE WHEN r.amount >= 116900 AND r.balance_at_loan >= 38500 THEN 'high-amt high-bal'

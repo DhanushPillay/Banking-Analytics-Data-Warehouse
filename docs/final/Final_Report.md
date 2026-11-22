@@ -58,7 +58,7 @@ raw CSVs
   -> Streamlit dashboard
 ```
 
-The Snowflake path is optional. The loader uploads the raw tables and four analytics tables. The dashboard can run in local DuckDB mode or hybrid Snowflake mode; the model and pattern CSVs stay local in both cases.
+The Snowflake path is optional. The loader uploads the five raw extracts, the full seven-table star schema, and the six analytics tables. The dashboard can run in local DuckDB mode or hybrid Snowflake mode; the model and pattern CSVs stay local in both cases.
 
 ![Pipeline architecture](images/architecture/02_pipeline_architecture.png)
 
@@ -80,7 +80,7 @@ One fact table with its dimensions is a star. Two fact tables sharing conformed 
 
 ![Galaxy schema](images/data_model/18_galaxy_schema.png)
 
-The dashboard reads this schema from DuckDB for the Data model card. The main analytics tables live in the `analytics` schema.
+The dashboard reads this schema from DuckDB for the Data model card, and the same seven tables are deployed to Snowflake `MART` for the live warehouse. The main analytics tables live in the `analytics` schema locally and in `MART` in Snowflake.
 
 ---
 
@@ -303,7 +303,7 @@ Dataset card, four-algorithm comparison table, metric and stability charts, PCA 
 
 ### Snowflake deployment
 
-Dashboard 2 documents the Snowflake deployment. It shows the RAW/MART schema split, the 13 expected objects with row counts, live counts and view samples when Snowflake mode is enabled, and the verification SQL. The loader routes raw extracts to RAW and modelled tables to MART, truncating each target before writing so reruns are idempotent.
+Dashboard 2 documents the Snowflake deployment. It shows the RAW/MART schema split, the 20 expected objects (18 tables plus two views) with row counts, live counts and view samples when Snowflake mode is enabled, and the verification SQL. The loader routes raw extracts to RAW and the star schema plus analytics tables to MART, truncating each target before writing so reruns are idempotent.
 
 ![Snowflake deployment](images/dashboard/27_dashboard_snowflake.png)
 

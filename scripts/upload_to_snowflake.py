@@ -15,6 +15,7 @@ import getpass
 import os
 from pathlib import Path
 
+import duckdb
 import pandas as pd
 import snowflake.connector
 from dotenv import load_dotenv
@@ -74,6 +75,31 @@ FILES = {  # csv path -> (table, schema, sep, renames, drop)
     ),
 }
 
+DUCKDB_PATH = ROOT / "data" / "banking_dw.duckdb"
+
+WAREHOUSE_TABLES = {  # Snowflake table -> query against the local star schema
+    "DIM_DATE": """
+        SELECT date_id, CAST(full_date AS DATE) AS full_date, day, month,
+               month_name, quarter, year, day_of_week, is_weekend
+        FROM mart.dim_date
+    """,
+    "DIM_BRANCH": "SELECT * FROM mart.dim_branch",
+    "DIM_CUSTOMER": """
+        SELECT customer_id, first_name, last_name, gender, gender_bin, age,
+               CAST(age_group AS VARCHAR) AS age_group, city, home_branch_id,
+               customer_segment, CAST(account_open_date AS DATE) AS account_open_date
+        FROM mart.dim_customer
+    """,
+    "DIM_ACCOUNT": """
+        SELECT account_id, customer_id, account_type,
+               CAST(open_date AS DATE) AS open_date, status
+        FROM mart.dim_account
+    """,
+    "DIM_LOAN_TYPE": "SELECT * FROM mart.dim_loan_type",
+    "FACT_LOANS": "SELECT * FROM mart.fact_loans",
+    "FACT_TRANSACTIONS": "SELECT * FROM mart.fact_transactions",
+}
+
 database = os.environ.get("SNOWFLAKE_DATABASE", "LOAN_DEFAULT_DW")
 session_schema = os.environ.get("SNOWFLAKE_SCHEMA", "RAW")
 
@@ -113,6 +139,37 @@ def connect_snowflake():
         )
 
 
+def load_frame(conn, cursor, df, table, target_schema) -> None:
+    df = df.copy()
+    df.columns = [str(column).upper() for column in df.columns]
+    cursor.execute(
+        f"SELECT COLUMN_NAME FROM {database}.INFORMATION_SCHEMA.COLUMNS "
+        "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s ORDER BY ORDINAL_POSITION",
+        (target_schema, table),
+    )
+    expected = [row[0] for row in cursor.fetchall()]
+    missing = set(expected) - set(df.columns)
+    extra = set(df.columns) - set(expected)
+    if missing or extra:
+        raise SystemExit(
+            f"{target_schema}.{table}: missing={sorted(missing)} "
+            f"extra={sorted(extra)}"
+        )
+
+    cursor.execute(f"TRUNCATE TABLE IF EXISTS {database}.{target_schema}.{table}")
+    ok, _, nrows, _ = write_pandas(
+        conn,
+        df,
+        table,
+        schema=target_schema,
+        chunk_size=100_000,
+        auto_create_table=False,
+    )
+    if not ok:
+        raise SystemExit(f"{target_schema}.{table}: write failed")
+    print(f"{target_schema}.{table}: {nrows} rows")
+
+
 def main() -> None:
     conn = connect_snowflake()
     try:
@@ -125,35 +182,18 @@ def main() -> None:
                 df["PARSED_DATE"] = pd.to_datetime(
                     df["PARSED_DATE"], errors="coerce"
                 ).dt.date
+            load_frame(conn, cursor, df, table, target_schema)
 
-            cursor.execute(
-                f"SELECT COLUMN_NAME FROM {database}.INFORMATION_SCHEMA.COLUMNS "
-                "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s ORDER BY ORDINAL_POSITION",
-                (target_schema, table),
-            )
-            expected = [row[0] for row in cursor.fetchall()]
-            missing = set(expected) - set(df.columns)
-            extra = set(df.columns) - set(expected)
-            if missing or extra:
-                raise SystemExit(
-                    f"{target_schema}.{table}: missing={sorted(missing)} "
-                    f"extra={sorted(extra)}"
-                )
-
-            cursor.execute(
-                f"TRUNCATE TABLE IF EXISTS {database}.{target_schema}.{table}"
-            )
-            ok, _, nrows, _ = write_pandas(
-                conn,
-                df,
-                table,
-                schema=target_schema,
-                chunk_size=100_000,
-                auto_create_table=False,
-            )
-            if not ok:
-                raise SystemExit(f"{target_schema}.{table}: write failed")
-            print(f"{target_schema}.{table}: {nrows} rows")
+        duck = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+        try:
+            for table, query in WAREHOUSE_TABLES.items():
+                df = duck.execute(query).fetchdf()
+                for column in df.columns:
+                    if pd.api.types.is_datetime64_any_dtype(df[column]):
+                        df[column] = df[column].dt.date
+                load_frame(conn, cursor, df, table, "MART")
+        finally:
+            duck.close()
     finally:
         conn.close()
     print("upload complete")

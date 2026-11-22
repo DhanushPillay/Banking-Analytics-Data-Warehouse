@@ -20,6 +20,13 @@ INVENTORY = pd.DataFrame(
         ("RAW", "RAW_CLIENT", "5,369", "Client extract"),
         ("RAW", "RAW_ACCOUNT", "4,500", "Account extract"),
         ("RAW", "RAW_DISP", "5,369", "Client-account disposition"),
+        ("MART", "DIM_DATE", "2,191", "Calendar dimension"),
+        ("MART", "DIM_BRANCH", "77", "Branch and district dimension"),
+        ("MART", "DIM_CUSTOMER", "5,369", "Customer demographics"),
+        ("MART", "DIM_ACCOUNT", "4,500", "Account dimension"),
+        ("MART", "DIM_LOAN_TYPE", "1", "Loan product dimension"),
+        ("MART", "FACT_LOANS", "682", "One row per loan"),
+        ("MART", "FACT_TRANSACTIONS", "1,056,320", "One row per transaction"),
         ("MART", "MART_LOAN_FEATURES", "682", "Leakage-safe feature mart"),
         ("MART", "MART_MODEL_SCORES", "682", "Out-of-fold review scores"),
         ("MART", "MART_LOAN_SEGMENTS", "682", "K-Means segment labels"),
@@ -45,6 +52,13 @@ UNION ALL SELECT 'MART.MART_LOAN_SEGMENTS', COUNT(*) FROM LOAN_DEFAULT_DW.MART.M
 UNION ALL SELECT 'MART.MART_LOAN_RISK', COUNT(*) FROM LOAN_DEFAULT_DW.MART.MART_LOAN_RISK
 UNION ALL SELECT 'MART.MART_CLUSTER_LABELS', COUNT(*) FROM LOAN_DEFAULT_DW.MART.MART_CLUSTER_LABELS
 UNION ALL SELECT 'MART.MART_CLUSTERING_COMPARISON', COUNT(*) FROM LOAN_DEFAULT_DW.MART.MART_CLUSTERING_COMPARISON
+UNION ALL SELECT 'MART.DIM_DATE', COUNT(*) FROM LOAN_DEFAULT_DW.MART.DIM_DATE
+UNION ALL SELECT 'MART.DIM_BRANCH', COUNT(*) FROM LOAN_DEFAULT_DW.MART.DIM_BRANCH
+UNION ALL SELECT 'MART.DIM_CUSTOMER', COUNT(*) FROM LOAN_DEFAULT_DW.MART.DIM_CUSTOMER
+UNION ALL SELECT 'MART.DIM_ACCOUNT', COUNT(*) FROM LOAN_DEFAULT_DW.MART.DIM_ACCOUNT
+UNION ALL SELECT 'MART.DIM_LOAN_TYPE', COUNT(*) FROM LOAN_DEFAULT_DW.MART.DIM_LOAN_TYPE
+UNION ALL SELECT 'MART.FACT_LOANS', COUNT(*) FROM LOAN_DEFAULT_DW.MART.FACT_LOANS
+UNION ALL SELECT 'MART.FACT_TRANSACTIONS', COUNT(*) FROM LOAN_DEFAULT_DW.MART.FACT_TRANSACTIONS
 ORDER BY table_name
 """
 
@@ -111,9 +125,10 @@ def snowflake_page() -> None:
         **RAW** holds the five source extracts: `RAW_LOAN`, `RAW_TRANS`,
         `RAW_CLIENT`, `RAW_ACCOUNT`, and `RAW_DISP`.
 
-        **MART** holds the feature mart, scores, segments, risk table, the
-        four-method cluster labels, the clustering comparison, and the two
-        reporting views `V_LOAN_PERF` and `V_TRANS_MONTHLY`.
+        **MART** holds the five conformed dimensions, the two fact tables, the
+        feature mart, scores, segments, risk table, the four-method cluster
+        labels, the clustering comparison, and the two reporting views
+        `V_LOAN_PERF` and `V_TRANS_MONTHLY`.
 
         The loader routes each CSV to its schema and truncates the target first,
         so a rerun replaces rows instead of appending duplicates.
