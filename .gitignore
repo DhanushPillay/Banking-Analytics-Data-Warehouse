@@ -24,3 +24,6 @@ presentation/
 
 # Power BI dashboard deliverable
 powerbi/
+
+# Local report source (not published)
+Report/
