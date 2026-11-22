@@ -20,6 +20,21 @@ from components.common import (
     show,
 )
 
+# Dashboard-only friendly names for the Czech transaction-type flags from PKDD'99.
+# Source data and artifacts keep the original codes.
+FLAG_LABELS = {
+    "type_PRIJEM": "money_in",
+    "type_VYDAJ": "money_out",
+    "type_VYBER": "cash_withdrawal",
+}
+
+
+def display_itemset(value: str) -> str:
+    text = parse_itemset(value)
+    for raw, label in FLAG_LABELS.items():
+        text = text.replace(raw, label)
+    return text
+
 
 def patterns_page() -> None:
     features = load_features()
@@ -55,7 +70,7 @@ def patterns_page() -> None:
     section("The rule worth a second look", "Highest lift in the rule set")
     st.markdown(
         f'<div class="note"><b>Rule</b><span style="font-family:var(--serif);font-size:1.15rem">'
-        f"{parse_itemset(top['antecedents'])} → {parse_itemset(top['consequents'])}</span></div>",
+        f"{display_itemset(top['antecedents'])} → {display_itemset(top['consequents'])}</span></div>",
         unsafe_allow_html=True,
     )
     grid(
@@ -81,8 +96,8 @@ def patterns_page() -> None:
 
     section("All rules", f"{len(rules)} rules pass the configured thresholds")
     table = rules.copy()
-    table["If"] = table["antecedents"].map(parse_itemset)
-    table["Then"] = table["consequents"].map(parse_itemset)
+    table["If"] = table["antecedents"].map(display_itemset)
+    table["Then"] = table["consequents"].map(display_itemset)
     table["Support %"] = (table["support"] * 100).round(2)
     table["Confidence %"] = (table["confidence"] * 100).round(1)
     grid(
@@ -101,7 +116,7 @@ def patterns_page() -> None:
         view["Confidence %"] = (view["confidence"] * 100).round(1)
         view["Covered"] = (view["coverage"] * loans).round().astype(int)
         view["Label"] = view["Covered"].astype(str) + " covered"
-        view["Rule"] = view["antecedents"].map(parse_itemset).str.replace("_", " ")
+        view["Rule"] = view["antecedents"].map(display_itemset).str.replace("_", " ")
         bars = (
             alt.Chart(view)
             .mark_bar()
@@ -151,7 +166,7 @@ def patterns_page() -> None:
     table = itemsets.copy()
     table["Support %"] = (table["support"] * 100).round(2)
     filtered = table[table["Support %"] >= threshold].sort_values("Support %", ascending=False)
-    table_view = filtered.assign(Items=filtered["itemsets"].map(parse_itemset))[["Items", "Support %"]]
+    table_view = filtered.assign(Items=filtered["itemsets"].map(display_itemset))[["Items", "Support %"]]
     top = table_view.head(12).assign(Items=lambda x: x["Items"].str.replace("_", " "))
     show(
         alt.Chart(top)
