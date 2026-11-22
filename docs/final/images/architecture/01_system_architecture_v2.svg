@@ -157,18 +157,6 @@
 <path d="M 766 690 L 784 682 L 996 682 L 996 738 L 766 738 Z" stroke="#1F7A78" stroke-width="1.2" fill="#FFFFFF"/>
 <text x="778" y="706" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#20302F" font-weight="bold" text-anchor="start">V_TRANS_MONTHLY</text>
 <text x="778" y="725" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#61706E" font-weight="normal" text-anchor="start">pre-loan monthly rollup</text>
-<rect x="504" y="780" width="160" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
-<text x="513" y="793" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">E · EXTRACT</text>
-<text x="513" y="805" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">6 raw CSV extracts</text>
-<rect x="680" y="780" width="160" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
-<text x="689" y="793" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">L · LOAD</text>
-<text x="689" y="805" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">Snowflake RAW staging</text>
-<rect x="856" y="780" width="168" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
-<text x="865" y="793" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">T · TRANSFORM</text>
-<text x="865" y="805" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">Python + SQL → MART</text>
-<path d="M 666 795 L 678 795" stroke="#1F7A78" stroke-width="1.5" fill="none" marker-end="url(#arr-teal)"/>
-<path d="M 842 795 L 854 795" stroke="#1F7A78" stroke-width="1.5" fill="none" marker-end="url(#arr-teal)"/>
-<text x="504" y="774" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.2">ELT PIPELINE</text>
 <text x="1080" y="170" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.6">EVIDENCE</text>
 <rect x="1080" y="190" width="250" height="150" rx="3" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
 <line x1="1098" y1="322" x2="1314" y2="322" stroke="#61706E" stroke-width="1"/>
@@ -269,23 +257,14 @@
 <text x="1472" y="628" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#61706E" font-weight="normal" text-anchor="middle">reads MART tables, no retraining</text>
 <text x="1472" y="650" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="middle">PAT + DWDM_DASHBOARD_NP</text>
 <text x="1472" y="672" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="middle">schema + leakage: local DuckDB</text>
-<rect x="480" y="826" width="560" height="70" rx="5" fill="#FBF2DF" stroke="#A9752B" stroke-width="1.4" stroke-dasharray="6 5"/>
-<text x="498" y="842" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#A9752B" font-weight="bold" text-anchor="start" letter-spacing="1.4">LEAKAGE + RECONCILIATION</text>
-<rect x="502" y="854" width="20" height="16" rx="2" fill="#FFFFFF" stroke="#A9752B" stroke-width="1.2"/>
-<path d="M 507 854 L 507 849 A 5 5 0 0 1 517 849 L 517 854" stroke="#A9752B" stroke-width="1.2" fill="none"/>
-<circle cx="512" cy="862" r="2.2" fill="#A9752B" stroke="none" stroke-width="1"/>
-<text x="534" y="860" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#7A5A1E" font-weight="bold" text-anchor="start">transaction_date &lt; loan_date</text>
-<text x="534" y="881" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#7A5A1E" font-weight="normal" text-anchor="start">0 post-loan rows   ·   CSV ↔ table counts reconciled</text>
-<text x="60" y="916" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.8">KEY</text>
-<line x1="60" y1="934" x2="94" y2="934" stroke="#1F7A78" stroke-width="2.2"/>
-<text x="103" y="938" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">data / warehouse</text>
-<line x1="300" y1="934" x2="334" y2="934" stroke="#C55F49" stroke-width="2.2"/>
-<text x="343" y="938" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">serving</text>
-<line x1="470" y1="934" x2="504" y2="934" stroke="#A9752B" stroke-width="2.2" stroke-dasharray="5 4"/>
-<text x="513" y="938" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">validation boundary</text>
-<text x="60" y="968" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="normal" text-anchor="start">Scope: PKDD'99 Czech banking extracts, 1993–1998 · counts reconciled against artifacts and Snowflake</text>
+<text x="60" y="806" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.8">KEY</text>
+<line x1="60" y1="824" x2="94" y2="824" stroke="#1F7A78" stroke-width="2.2"/>
+<text x="103" y="828" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">data / warehouse</text>
+<line x1="300" y1="824" x2="334" y2="824" stroke="#C55F49" stroke-width="2.2"/>
+<text x="343" y="828" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">serving</text>
+<text x="60" y="866" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="normal" text-anchor="start">Scope: PKDD'99 Czech banking extracts, 1993–1998 · counts reconciled against artifacts and Snowflake</text>
 <path d="M 438 292 C 452 290, 464 287, 476 284" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
-<text x="404" y="262" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="middle">extract + load</text>
+<text x="400" y="190" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="middle">extract + load</text>
 <path d="M 286 508 C 362 494, 414 466, 476 452" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
 <text x="360" y="470" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#1F7A78" font-weight="bold" text-anchor="middle">T · transform + deploy</text>
 <path d="M 1042 690 C 1064 672, 1072 630, 1078 590" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
