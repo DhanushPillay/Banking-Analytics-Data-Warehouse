@@ -35,15 +35,7 @@ optional; on this machine WSL2 virtualization is unavailable, so DuckDB is the
 default backend. The table names and SQL stay close to the planned Snowflake
 warehouse, and `sql/snowflake/` already holds the cloud DDL.
 
-```mermaid
-graph LR
-    A[data/*.csv] -->|pandas ETL| B[(DuckDB mart)]
-    B -->|sql/local/03_feature_mart.sql| C[(analytics.loan_features)]
-    B -->|galaxy-schema tables| D[Streamlit app]
-    C --> E[Models, segments, rules]
-    E --> F[(artifacts + analytics tables)]
-    F --> D
-```
+![System architecture](docs/final/images/architecture/01_system_architecture.png)
 
 - Warehouse file: `data/banking_dw.duckdb`
 - Schemas: `mart` (galaxy schema) and `analytics` (features, scores, segments, rules)
