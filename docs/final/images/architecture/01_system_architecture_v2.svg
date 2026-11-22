@@ -66,21 +66,21 @@
 <text x="575" y="241" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#5C6976" font-weight="normal" text-anchor="middle">scripts/build_local.py</text>
 <text x="575" y="259" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#5C6976" font-weight="normal" text-anchor="middle">local DuckDB</text>
 <path d="M 575 270 L 575 302" stroke="#1F2D3D" stroke-width="1.6" fill="none" marker-end="url(#arr-n)"/>
-<rect x="470" y="316" width="210" height="106" rx="0" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
+<rect x="470" y="316" width="210" height="76" rx="0" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
 <ellipse cx="575.0" cy="316" rx="105.0" ry="10" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<path d="M 470 422 A 105.0 10 0 0 0 680 422" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<text x="575" y="336" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1F2D3D" font-weight="bold" text-anchor="middle">RAW staging</text>
-<text x="575" y="358" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#5C6976" font-weight="normal" text-anchor="middle">Snowflake RAW · 5 tables</text>
-<text x="486" y="456" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_LOAN</text>
-<text x="664" y="456" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">682</text>
-<text x="486" y="478" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_TRANS</text>
-<text x="664" y="478" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">1,056,320</text>
-<text x="486" y="500" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_CLIENT</text>
-<text x="664" y="500" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">5,369</text>
-<text x="486" y="522" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_ACCOUNT</text>
-<text x="664" y="522" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">4,500</text>
-<text x="486" y="544" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_DISP</text>
-<text x="664" y="544" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">5,369</text>
+<path d="M 470 392 A 105.0 10 0 0 0 680 392" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
+<text x="575" y="350" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1F2D3D" font-weight="bold" text-anchor="middle">RAW staging</text>
+<text x="575" y="372" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#5C6976" font-weight="normal" text-anchor="middle">Snowflake RAW · 5 tables</text>
+<text x="486" y="430" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_LOAN</text>
+<text x="664" y="430" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">682</text>
+<text x="486" y="452" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_TRANS</text>
+<text x="664" y="452" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">1,056,320</text>
+<text x="486" y="474" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_CLIENT</text>
+<text x="664" y="474" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">5,369</text>
+<text x="486" y="496" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_ACCOUNT</text>
+<text x="664" y="496" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">4,500</text>
+<text x="486" y="518" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F2D3D" font-weight="normal" text-anchor="start">RAW_DISP</text>
+<text x="664" y="518" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#E07B2B" font-weight="bold" text-anchor="end">5,369</text>
 <rect x="780" y="130" width="400" height="660" rx="6" fill="#FFFFFF" stroke="#D6DCE4" stroke-width="1.4"/>
 <text x="980.0" y="166" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Storage layer</text>
 <line x1="794" y1="182" x2="1166" y2="182" stroke="#D6DCE4" stroke-width="1.2"/>
