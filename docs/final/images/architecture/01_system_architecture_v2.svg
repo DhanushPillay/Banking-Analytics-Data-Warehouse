@@ -84,48 +84,41 @@
 <rect x="780" y="130" width="400" height="660" rx="6" fill="#FFFFFF" stroke="#D6DCE4" stroke-width="1.4"/>
 <text x="980.0" y="166" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Storage layer</text>
 <line x1="794" y1="182" x2="1166" y2="182" stroke="#D6DCE4" stroke-width="1.2"/>
-<rect x="920" y="216" width="220" height="58" rx="0" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<ellipse cx="1030.0" cy="216" rx="110.0" ry="10" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<path d="M 920 274 A 110.0 10 0 0 0 1140 274" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<text x="1030" y="236" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Feature mart + artifacts</text>
-<text x="1030" y="256" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">28 cols · 18 model features</text>
-<path d="M 970 286 L 970 316" stroke="#1F2D3D" stroke-width="1.3" fill="none" marker-end="url(#arr-n)"/>
-<path d="M 1090 316 L 1090 286" stroke="#1F2D3D" stroke-width="1.3" fill="none" marker-end="url(#arr-n)"/>
-<rect x="830" y="330" width="300" height="166" rx="0" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<ellipse cx="980.0" cy="330" rx="150.0" ry="10" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<path d="M 830 496 A 150.0 10 0 0 0 1130 496" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
-<text x="980" y="360" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Data warehouse</text>
-<text x="980" y="386" font-family="Arial, Helvetica, sans-serif" font-size="12.5" fill="#5C6976" font-weight="normal" text-anchor="middle">MART star schema</text>
-<text x="980" y="412" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#E07B2B" font-weight="bold" text-anchor="middle">5 dimensions + 2 facts</text>
-<text x="980" y="448" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">DIM_DATE 2,191 · DIM_BRANCH 77 · DIM_CUSTOMER 5,369</text>
-<text x="980" y="466" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">DIM_ACCOUNT 4,500 · DIM_LOAN_TYPE 1</text>
-<text x="980" y="488" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">FACT_LOANS 682 · FACT_TRANSACTIONS 1,056,320</text>
-<rect x="796" y="536" width="368" height="226" rx="5" fill="#FFFFFF" stroke="#D6DCE4" stroke-width="1.2" stroke-dasharray="7 5"/>
-<text x="816" y="560" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1F2D3D" font-weight="bold" text-anchor="start">Data marts</text>
-<rect x="804" y="572" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="812" y="586" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_FEATURES</text>
-<text x="812" y="599" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
-<rect x="982" y="572" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="990" y="586" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_MODEL_SCORES</text>
-<text x="990" y="599" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
-<rect x="804" y="616" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="812" y="630" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_SEGMENTS</text>
-<text x="812" y="643" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
-<rect x="982" y="616" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="990" y="630" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_RISK</text>
-<text x="990" y="643" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
-<rect x="804" y="660" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="812" y="674" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_CLUSTER_LABELS</text>
-<text x="812" y="687" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
-<rect x="982" y="660" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="990" y="674" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_CLUSTERING_COMPARISON</text>
-<text x="990" y="687" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">4</text>
-<rect x="804" y="704" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="812" y="718" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">V_LOAN_PERF</text>
-<text x="812" y="731" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">view</text>
-<rect x="982" y="704" width="170" height="34" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
-<text x="990" y="718" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">V_TRANS_MONTHLY</text>
-<text x="990" y="731" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">view</text>
+<rect x="830" y="230" width="300" height="170" rx="0" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
+<ellipse cx="980.0" cy="230" rx="150.0" ry="10" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
+<path d="M 830 400 A 150.0 10 0 0 0 1130 400" fill="#F8F9FB" stroke="#E07B2B" stroke-width="1.4"/>
+<text x="980" y="262" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Data warehouse</text>
+<text x="980" y="286" font-family="Arial, Helvetica, sans-serif" font-size="12.5" fill="#5C6976" font-weight="normal" text-anchor="middle">MART star schema</text>
+<text x="980" y="310" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#E07B2B" font-weight="bold" text-anchor="middle">5 dimensions + 2 facts</text>
+<text x="980" y="342" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">DIM_DATE 2,191 · DIM_BRANCH 77 · DIM_CUSTOMER 5,369</text>
+<text x="980" y="360" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">DIM_ACCOUNT 4,500 · DIM_LOAN_TYPE 1</text>
+<text x="980" y="382" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#5C6976" font-weight="normal" text-anchor="middle">FACT_LOANS 682 · FACT_TRANSACTIONS 1,056,320</text>
+<rect x="796" y="438" width="368" height="300" rx="5" fill="#FFFFFF" stroke="#D6DCE4" stroke-width="1.2" stroke-dasharray="7 5"/>
+<text x="816" y="464" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1F2D3D" font-weight="bold" text-anchor="start">Data marts</text>
+<rect x="804" y="480" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="812" y="499" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_FEATURES</text>
+<text x="812" y="514" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
+<rect x="982" y="480" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="990" y="499" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_MODEL_SCORES</text>
+<text x="990" y="514" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
+<rect x="804" y="540" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="812" y="559" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_SEGMENTS</text>
+<text x="812" y="574" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
+<rect x="982" y="540" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="990" y="559" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_LOAN_RISK</text>
+<text x="990" y="574" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
+<rect x="804" y="600" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="812" y="619" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_CLUSTER_LABELS</text>
+<text x="812" y="634" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">682</text>
+<rect x="982" y="600" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="990" y="619" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">MART_CLUSTERING_COMPARISON</text>
+<text x="990" y="634" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">4</text>
+<rect x="804" y="660" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="812" y="679" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">V_LOAN_PERF</text>
+<text x="812" y="694" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">view</text>
+<rect x="982" y="660" width="170" height="44" rx="3" fill="#EEF1F4" stroke="#D6DCE4" stroke-width="0.8"/>
+<text x="990" y="679" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#1F2D3D" font-weight="bold" text-anchor="start">V_TRANS_MONTHLY</text>
+<text x="990" y="694" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#5C6976" font-weight="normal" text-anchor="start">view</text>
 <rect x="1240" y="130" width="300" height="660" rx="6" fill="#FFFFFF" stroke="#D6DCE4" stroke-width="1.4"/>
 <text x="1390.0" y="166" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#1F2D3D" font-weight="bold" text-anchor="middle">Consumption layer</text>
 <line x1="1254" y1="182" x2="1526" y2="182" stroke="#D6DCE4" stroke-width="1.2"/>
