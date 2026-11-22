@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="Banking analytics warehouse architecture">
+<title>Banking analytics warehouse - container view</title>
+<defs>
+<marker id="arr-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F7A78"/></marker>
+<marker id="arr-coral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C55F49"/></marker>
+</defs>
+<rect x="0" y="0" width="1600" height="1000" rx="0" fill="#FBFAF7" stroke="none" stroke-width="1"/>
+<rect x="18" y="18" width="1564" height="964" rx="0" fill="none" stroke="#E4E0D5" stroke-width="1"/>
+<rect x="24" y="24" width="1552" height="952" rx="0" fill="none" stroke="#F0EDE3" stroke-width="1"/>
+<text x="56" y="58" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1F7A78" font-weight="bold" text-anchor="start" letter-spacing="2.2">SYSTEM ARCHITECTURE  /  CONTAINER VIEW</text>
+<text x="56" y="94" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#20302F" font-weight="bold" text-anchor="start">Banking analytics warehouse</text>
+<text x="56" y="122" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#61706E" font-weight="normal" text-anchor="start">PKDD'99 extracts  →  ELT: extract · load · transform  →  Snowflake  →  review</text>
+<text x="1120" y="48" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.8">KEY</text>
+<line x1="1120" y1="66" x2="1154" y2="66" stroke="#1F7A78" stroke-width="2.2"/>
+<text x="1163" y="70" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">data / warehouse</text>
+<line x1="1120" y1="88" x2="1154" y2="88" stroke="#C55F49" stroke-width="2.2"/>
+<text x="1163" y="92" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">serving</text>
+<line x1="1120" y1="110" x2="1154" y2="110" stroke="#A9752B" stroke-width="2.2" stroke-dasharray="5 4"/>
+<text x="1163" y="114" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="normal" text-anchor="start">validation boundary</text>
+<text x="60" y="170" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.6">01  SOURCE SYSTEMS</text>
+<g transform="rotate(-3 122.0 237.0)">
+<rect x="62" y="198" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 162 198 L 182 198 L 182 218 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="71" y1="226" x2="173" y2="226" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="71" y="217" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">client.csv</text>
+<text x="71" y="246" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">5,369</text>
+<text x="71" y="263" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<g transform="rotate(0 254.0 237.0)">
+<rect x="194" y="198" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 294 198 L 314 198 L 314 218 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="203" y1="226" x2="305" y2="226" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="203" y="217" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">account.csv</text>
+<text x="203" y="246" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">4,500</text>
+<text x="203" y="263" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<g transform="rotate(3 386.0 237.0)">
+<rect x="326" y="198" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 426 198 L 446 198 L 446 218 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="335" y1="226" x2="437" y2="226" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="335" y="217" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">disp.csv</text>
+<text x="335" y="246" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">5,369</text>
+<text x="335" y="263" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<g transform="rotate(-3 122.0 335.0)">
+<rect x="62" y="296" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 162 296 L 182 296 L 182 316 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="71" y1="324" x2="173" y2="324" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="71" y="315" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">trans.csv</text>
+<text x="71" y="344" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">1,056,320</text>
+<text x="71" y="361" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<g transform="rotate(0 254.0 335.0)">
+<rect x="194" y="296" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 294 296 L 314 296 L 314 316 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="203" y1="324" x2="305" y2="324" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="203" y="315" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">loan.csv</text>
+<text x="203" y="344" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">682</text>
+<text x="203" y="361" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<g transform="rotate(3 386.0 335.0)">
+<rect x="326" y="296" width="120" height="78" rx="2" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<path d="M 426 296 L 446 296 L 446 316 Z" stroke="#C3CCCB" stroke-width="0.9" fill="#FFFFFF"/>
+<line x1="335" y1="324" x2="437" y2="324" stroke="#E6E9E7" stroke-width="0.8"/>
+<text x="335" y="315" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#20302F" font-weight="bold" text-anchor="start">district.csv</text>
+<text x="335" y="344" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#1F7A78" font-weight="bold" text-anchor="start">77</text>
+<text x="335" y="361" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">rows</text>
+</g>
+<text x="60" y="432" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.6">TRANSFORM  ·  LOCAL BUILD</text>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(0 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(30 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(60 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(90 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(120 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(150 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(180 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(210 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(240 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(270 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(300 132 520)"/>
+<rect x="127" y="462" width="10" height="18" rx="2" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1" transform="rotate(330 132 520)"/>
+<circle cx="132" cy="520" r="44" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1.6"/>
+<circle cx="132" cy="520" r="17" fill="#FBFAF7" stroke="#1F7A78" stroke-width="1.3"/>
+<rect x="222" y="494" width="60" height="52" rx="3" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1.2"/>
+<ellipse cx="252" cy="494" rx="30" ry="9" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.2"/>
+<ellipse cx="252" cy="546" rx="30" ry="9" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1.2"/>
+<text x="198" y="606" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#20302F" font-weight="bold" text-anchor="middle">Python + SQL</text>
+<text x="198" y="626" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="normal" text-anchor="middle">scripts/build_local.py</text>
+<text x="198" y="644" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="normal" text-anchor="middle">local DuckDB</text>
+<text x="760" y="150" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1F7A78" font-weight="bold" text-anchor="middle" letter-spacing="1">SNOWFLAKE  ·  LOAN_DEFAULT_DW  ·  PBI_WH</text>
+<rect x="480" y="160" width="560" height="560" rx="6" fill="#FFFFFF" stroke="#20302F" stroke-width="1.6"/>
+<rect x="480" y="160" width="560" height="10" rx="0" fill="#1F7A78" stroke="none" stroke-width="1"/>
+<line x1="480" y1="310" x2="1040" y2="310" stroke="#D7DEDC" stroke-width="1.2"/>
+<line x1="480" y1="590" x2="1040" y2="590" stroke="#D7DEDC" stroke-width="1.2"/>
+<text x="502" y="194" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1F7A78" font-weight="bold" text-anchor="start" letter-spacing="1.2">02  STAGING  /  RAW</text>
+<rect x="516" y="216" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="518" y="219" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="520" y="222" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<text x="522" y="250" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="bold" text-anchor="start">LOAN</text>
+<text x="522" y="268" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="start">682</text>
+<rect x="618" y="216" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="620" y="219" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="622" y="222" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<text x="624" y="250" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="bold" text-anchor="start">TRANS</text>
+<text x="624" y="268" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="start">1,056,320</text>
+<rect x="720" y="216" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="722" y="219" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="724" y="222" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<text x="726" y="250" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="bold" text-anchor="start">CLIENT</text>
+<text x="726" y="268" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="start">5,369</text>
+<rect x="822" y="216" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="824" y="219" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="826" y="222" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<text x="828" y="250" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="bold" text-anchor="start">ACCOUNT</text>
+<text x="828" y="268" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="start">4,500</text>
+<rect x="924" y="216" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="926" y="219" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<rect x="928" y="222" width="82" height="62" rx="2" fill="#FFFFFF" stroke="#1F7A78" stroke-width="0.8"/>
+<text x="930" y="250" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="bold" text-anchor="start">DISP</text>
+<text x="930" y="268" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="start">5,369</text>
+<text x="502" y="336" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1F7A78" font-weight="bold" text-anchor="start" letter-spacing="1.2">03  DATA WAREHOUSE  /  MART</text>
+<text x="520" y="360" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1">DIMENSIONS  ·  5</text>
+<rect x="520" y="372" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="527" y="391" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">DIM_DATE  2,191</text>
+<rect x="686" y="372" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="693" y="391" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">DIM_BRANCH  77</text>
+<rect x="852" y="372" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="859" y="391" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">DIM_CUSTOMER  5,369</text>
+<rect x="520" y="404" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="527" y="423" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">DIM_ACCOUNT  4,500</text>
+<rect x="686" y="404" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="693" y="423" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">DIM_LOAN_TYPE  1</text>
+<text x="520" y="448" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1">FACTS  ·  2</text>
+<rect x="520" y="460" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="527" y="479" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">FACT_LOANS  682</text>
+<rect x="686" y="460" width="176" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="693" y="479" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#20302F" font-weight="normal" text-anchor="start">FACT_TRANSACTIONS  1,056,320</text>
+<text x="520" y="502" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1">04  ANALYTICS LAYER  ·  6</text>
+<rect x="520" y="514" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="527" y="533" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_LOAN_FEATURES  682</text>
+<rect x="686" y="514" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="693" y="533" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_MODEL_SCORES  682</text>
+<rect x="852" y="514" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="859" y="533" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_LOAN_SEGMENTS  682</text>
+<rect x="520" y="546" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="527" y="565" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_LOAN_RISK  682</text>
+<rect x="686" y="546" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="693" y="565" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_CLUSTER_LABELS  682</text>
+<rect x="852" y="546" width="156" height="26" rx="4" fill="#E7F2F0" stroke="#1F7A78" stroke-width="0.9"/>
+<text x="859" y="565" font-family="Arial, Helvetica, sans-serif" font-size="8.4" fill="#20302F" font-weight="normal" text-anchor="start">MART_CLUSTERING_COMPARISON  4</text>
+<text x="502" y="620" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#1F7A78" font-weight="bold" text-anchor="start" letter-spacing="1.2">VIEWS</text>
+<path d="M 520 646 L 538 638 L 750 638 L 750 694 L 520 694 Z" stroke="#1F7A78" stroke-width="1.2" fill="#FFFFFF"/>
+<text x="532" y="662" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#20302F" font-weight="bold" text-anchor="start">V_LOAN_PERF</text>
+<text x="532" y="681" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#61706E" font-weight="normal" text-anchor="start">features · scores · segments</text>
+<path d="M 766 646 L 784 638 L 996 638 L 996 694 L 766 694 Z" stroke="#1F7A78" stroke-width="1.2" fill="#FFFFFF"/>
+<text x="778" y="662" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#20302F" font-weight="bold" text-anchor="start">V_TRANS_MONTHLY</text>
+<text x="778" y="681" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#61706E" font-weight="normal" text-anchor="start">pre-loan monthly rollup</text>
+<rect x="504" y="744" width="160" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
+<text x="513" y="757" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">E · EXTRACT</text>
+<text x="513" y="769" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">6 raw CSV extracts</text>
+<rect x="680" y="744" width="160" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
+<text x="689" y="757" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">L · LOAD</text>
+<text x="689" y="769" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">Snowflake RAW staging</text>
+<rect x="856" y="744" width="168" height="30" rx="4" fill="#FFFFFF" stroke="#1F7A78" stroke-width="1.1"/>
+<text x="865" y="757" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1F7A78" font-weight="bold" text-anchor="start">T · TRANSFORM</text>
+<text x="865" y="769" font-family="Arial, Helvetica, sans-serif" font-size="8.2" fill="#61706E" font-weight="normal" text-anchor="start">Python + SQL → MART</text>
+<path d="M 666 759 L 678 759" stroke="#1F7A78" stroke-width="1.5" fill="none" marker-end="url(#arr-teal)"/>
+<path d="M 842 759 L 854 759" stroke="#1F7A78" stroke-width="1.5" fill="none" marker-end="url(#arr-teal)"/>
+<text x="504" y="738" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.2">ELT PIPELINE</text>
+<text x="1080" y="170" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.6">EVIDENCE</text>
+<rect x="1080" y="190" width="250" height="150" rx="3" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<line x1="1098" y1="322" x2="1314" y2="322" stroke="#61706E" stroke-width="1"/>
+<line x1="1098" y1="322" x2="1098" y2="206" stroke="#61706E" stroke-width="1"/>
+<line x1="1098" y1="322" x2="1314" y2="206" stroke="#D9DEDC" stroke-width="1" stroke-dasharray="4 4"/>
+<path d="M 1098,322 L 1118,296 L 1146,266 L 1180,240 L 1222,220 L 1266,210 L 1314,205" stroke="#1F7A78" stroke-width="2.2" fill="none"/>
+<text x="1098" y="202" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">TPR</text>
+<text x="1292" y="338" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#61706E" font-weight="normal" text-anchor="start">FPR</text>
+<text x="1080" y="360" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="bold" text-anchor="start">Gradient Boosting · F1 0.571</text>
+<text x="1080" y="376" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#61706E" font-weight="normal" text-anchor="start">ROC / PR evidence, not retrained</text>
+<rect x="1080" y="394" width="250" height="86" rx="4" fill="#FFFFFF" stroke="#A9752B" stroke-width="1.2"/>
+<rect x="1080" y="394" width="5" height="86" rx="0" fill="#A9752B" stroke="none" stroke-width="1"/>
+<text x="1094" y="418" font-family="Arial, Helvetica, sans-serif" font-size="11.5" fill="#20302F" font-weight="bold" text-anchor="start">negative_balance → default</text>
+<text x="1094" y="440" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#A9752B" font-weight="bold" text-anchor="start">lift 8.97</text>
+<text x="1170" y="440" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#61706E" font-weight="normal" text-anchor="start">confidence 1.00</text>
+<text x="1094" y="463" font-family="Arial, Helvetica, sans-serif" font-size="9.5" fill="#61706E" font-weight="normal" text-anchor="start">27 / 682 loans · 35.5% of defaults</text>
+<rect x="1080" y="496" width="250" height="150" rx="3" fill="#FFFFFF" stroke="#C3CCCB" stroke-width="1.1"/>
+<circle cx="1104" cy="530" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1122" cy="548" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1138" cy="522" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1152" cy="560" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1166" cy="536" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1180" cy="566" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1194" cy="544" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1108" cy="576" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1132" cy="584" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1158" cy="590" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1174" cy="606" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1120" cy="610" r="4.5" fill="#E7F2F0" stroke="#1F7A78" stroke-width="1"/>
+<circle cx="1236" cy="514" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1252" cy="532" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1270" cy="520" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1286" cy="546" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1302" cy="530" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1248" cy="566" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1266" cy="582" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<circle cx="1284" cy="570" r="4.5" fill="#FBEEE9" stroke="#C55F49" stroke-width="1"/>
+<text x="1148" y="634" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1F7A78" font-weight="bold" text-anchor="middle">421</text>
+<text x="1272" y="634" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C55F49" font-weight="bold" text-anchor="middle">261</text>
+<text x="1080" y="662" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#20302F" font-weight="bold" text-anchor="start">K-Means k=2 · behavioural features</text>
+<text x="1372" y="230" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#61706E" font-weight="bold" text-anchor="start" letter-spacing="1.6">05  PRESENTATION</text>
+<rect x="1372" y="248" width="200" height="336" rx="6" fill="#FFFFFF" stroke="#20302F" stroke-width="1.5"/>
+<rect x="1372" y="248" width="200" height="30" rx="0" fill="#EEF1F0" stroke="none" stroke-width="1"/>
+<circle cx="1386" cy="263" r="4" fill="#C55F49" stroke="none" stroke-width="1"/>
+<circle cx="1400" cy="263" r="4" fill="#A9752B" stroke="none" stroke-width="1"/>
+<circle cx="1414" cy="263" r="4" fill="#1F7A78" stroke="none" stroke-width="1"/>
+<rect x="1428" y="257" width="130" height="12" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<text x="1493" y="266" font-family="Arial, Helvetica, sans-serif" font-size="7.5" fill="#61706E" font-weight="normal" text-anchor="middle">localhost / app</text>
+<rect x="1382" y="288" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1387" y="293" width="76" height="7" rx="0" fill="#E7F2F0" stroke="none" stroke-width="1"/>
+<rect x="1387" y="306" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="316" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="326" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1388" y="342" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Executive</text>
+<rect x="1476" y="288" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1481" y="293" width="76" height="7" rx="0" fill="#FBEEE9" stroke="none" stroke-width="1"/>
+<rect x="1481" y="306" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="316" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="326" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1482" y="342" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Data &amp; leakage</text>
+<rect x="1382" y="356" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1387" y="361" width="76" height="7" rx="0" fill="#E7F2F0" stroke="none" stroke-width="1"/>
+<rect x="1387" y="374" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="384" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="394" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1388" y="410" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Models</text>
+<rect x="1476" y="356" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1481" y="361" width="76" height="7" rx="0" fill="#FBEEE9" stroke="none" stroke-width="1"/>
+<rect x="1481" y="374" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="384" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="394" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1482" y="410" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Patterns</text>
+<rect x="1382" y="424" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1387" y="429" width="76" height="7" rx="0" fill="#E7F2F0" stroke="none" stroke-width="1"/>
+<rect x="1387" y="442" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="452" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="462" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1388" y="478" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Segments</text>
+<rect x="1476" y="424" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1481" y="429" width="76" height="7" rx="0" fill="#FBEEE9" stroke="none" stroke-width="1"/>
+<rect x="1481" y="442" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="452" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="462" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1482" y="478" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Simulator</text>
+<rect x="1382" y="492" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1387" y="497" width="76" height="7" rx="0" fill="#E7F2F0" stroke="none" stroke-width="1"/>
+<rect x="1387" y="510" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="520" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1387" y="530" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1388" y="546" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Snowflake</text>
+<rect x="1476" y="492" width="86" height="58" rx="3" fill="#FBFAF7" stroke="#C3CCCB" stroke-width="0.8"/>
+<rect x="1481" y="497" width="76" height="7" rx="0" fill="#FBEEE9" stroke="none" stroke-width="1"/>
+<rect x="1481" y="510" width="76" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="520" width="65" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<rect x="1481" y="530" width="54" height="4" rx="0" fill="#DCE3E1" stroke="none" stroke-width="1"/>
+<text x="1482" y="546" font-family="Arial, Helvetica, sans-serif" font-size="8.6" fill="#61706E" font-weight="normal" text-anchor="start">Data model</text>
+<text x="1472" y="604" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#20302F" font-weight="bold" text-anchor="middle">8-page Streamlit app</text>
+<text x="1472" y="622" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#61706E" font-weight="normal" text-anchor="middle">reads MART tables, no retraining</text>
+<rect x="480" y="780" width="560" height="70" rx="5" fill="#FBF2DF" stroke="#A9752B" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="498" y="796" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#A9752B" font-weight="bold" text-anchor="start" letter-spacing="1.4">LEAKAGE + RECONCILIATION</text>
+<rect x="502" y="808" width="20" height="16" rx="2" fill="#FFFFFF" stroke="#A9752B" stroke-width="1.2"/>
+<path d="M 507 808 L 507 803 A 5 5 0 0 1 517 803 L 517 808" stroke="#A9752B" stroke-width="1.2" fill="none"/>
+<circle cx="512" cy="816" r="2.2" fill="#A9752B" stroke="none" stroke-width="1"/>
+<text x="534" y="812" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#7A5A1E" font-weight="bold" text-anchor="start">transaction_date &lt; loan_date</text>
+<text x="534" y="833" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#7A5A1E" font-weight="normal" text-anchor="start">0 post-loan rows   ·   CSV ↔ table counts reconciled</text>
+<path d="M 438 292 C 452 290, 464 287, 476 284" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
+<text x="420" y="276" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#1F7A78" font-weight="bold" text-anchor="middle">extract + load</text>
+<path d="M 286 508 C 362 494, 414 466, 476 452" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
+<text x="360" y="470" font-family="Arial, Helvetica, sans-serif" font-size="9.2" fill="#1F7A78" font-weight="bold" text-anchor="middle">T · transform + deploy</text>
+<path d="M 1042 664 C 1064 648, 1070 614, 1078 578" stroke="#1F7A78" stroke-width="2" fill="none" marker-end="url(#arr-teal)"/>
+<text x="1062" y="626" font-family="Arial, Helvetica, sans-serif" font-size="10.5" fill="#1F7A78" font-weight="bold" text-anchor="middle">read</text>
+<path d="M 1042 196 C 1074 120, 1150 116, 1230 130 C 1318 145, 1366 184, 1372 244" stroke="#C55F49" stroke-width="2.2" fill="none" marker-end="url(#arr-coral)"/>
+<text x="1212" y="122" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C55F49" font-weight="bold" text-anchor="middle">serve</text>
+</svg>
